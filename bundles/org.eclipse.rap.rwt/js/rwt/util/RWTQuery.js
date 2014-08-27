@@ -13,7 +13,7 @@ namespace( "rwt.util" );
 
 (function(){
 
-var Style = rwt.html.Style;
+  var Style = rwt.html.Style;
 
 /**
  * @private
@@ -32,9 +32,19 @@ var $ = rwt.util.RWTQuery;
 $.prototype = {
 
   init : function( target ) {
+    if( typeof target === "string" ) {
+      target = parseHTML( target );
+    }
     var isWidget = ( target.classname || "" ).indexOf( "rwt.widgets" ) === 0;
     this.__access = function( args, callbackWidget, callbackElement ) {
-      var callback = isWidget ? callbackWidget : callbackElement;
+      var callback = callbackElement;
+      if( isWidget ) {
+        if( callbackWidget ) {
+          callback = callbackWidget;
+        } else {
+          target = get_widget.apply( this, [ target, [ 0 ] ] );
+        }
+      }
       return callback.apply( this, [ target, args ] );
     };
   },
@@ -53,7 +63,7 @@ $.prototype = {
   },
 
   append : function() {
-    return this.__access( arguments, append_widget, append_element );
+    return this.__access( arguments, null, append_element );
   },
 
   css : function() {
@@ -66,6 +76,10 @@ $.prototype = {
 
   detach : function() {
     return this.__access( arguments, null, detach_element );
+  },
+
+  "get" : function() {
+    return this.__access( arguments, get_widget, get_element );
   }
 
 };
@@ -173,15 +187,6 @@ var css_element = unwrapArgsFor( function( element, args ) {
   return this;
 } );
 
-var append_widget = function( widget, args ) {
-  if( !widget.getElement() ) {
-    rwt.widgets.base.Widget.removeFromGlobalElementQueue( widget );
-    widget._createElementImpl();
-  }
-  widget.getElement().appendChild( args[ 0 ] );
-  return this;
-};
-
 var append_element = function( element, args ) {
   element.appendChild( args[ 0 ] );
   return this;
@@ -190,6 +195,20 @@ var append_element = function( element, args ) {
 var detach_element = function( element ) {
   element.parentNode.removeChild( element );
   return this;
+};
+
+var get_element = function( element, args ) {
+  var result = [ element ];
+  return args.length > 0 ? result[ args[ 0 ] ] : result;
+};
+
+var get_widget = function( widget, args ) {
+  if( !widget.getElement() ) {
+    rwt.widgets.base.Widget.removeFromGlobalElementQueue( widget );
+    widget._createElementImpl();
+  }
+  var result = [ widget.getElement() ];
+  return args.length > 0 ? result[ args[ 0 ] ] : result;
 };
 
 var text_element = function( element, args ) {
@@ -212,5 +231,16 @@ var parseCssValue = function( args ) {
   }
   return args[ 1 ];
 };
+
+var parseHTML = function( str ) {
+  var parsed = rsingleTag.exec( str );
+  if( parsed ) {
+    return document.createElement( parsed[ 1 ] );
+  }
+  throw new Error( "Invalid or unsupported HTML string" );
+};
+
+var rsingleTag = (/^<(\w+)\s*\/?>(?:<\/\1>|)$/);
+
 
 }());

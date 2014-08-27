@@ -131,7 +131,6 @@ describe( "RWTQuery", function() {
       var element;
       var childElement;
 
-
       beforeEach( function() {
         spyOn( rwt.widgets.base.Widget, "removeFromGlobalElementQueue" );
         element = null;
@@ -169,6 +168,40 @@ describe( "RWTQuery", function() {
       } );
 
     } );
+
+    describe( "get", function() {
+
+      var element;
+
+      beforeEach( function() {
+        spyOn( rwt.widgets.base.Widget, "removeFromGlobalElementQueue" );
+        element = null;
+        widget.getElement = function() {
+          return element;
+        };
+        widget._createElementImpl = function() {
+          element = document.createElement( "div" );
+        };
+      } );
+
+      it( "returns array with newly created element", function() {
+        expect( $( widget ).get().length ).toBe( 1 );
+        expect( $( widget ).get()[0] ).toBe( widget.getElement() );
+        expect( widget.getElement() ).toBeTruthy();
+        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( widget );
+      } );
+
+      it( "returns newly created element", function() {
+        expect( $( widget ).get( 0 ) ).toBe( widget.getElement() );
+        expect( widget.getElement() ).toBeTruthy();
+        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( widget );
+      } );
+
+      it( "returns undefined for out of bounds index", function() {
+        expect( $( widget ).get( 1 ) ).toBeUndefined();
+      } );
+
+    });
 
   } );
 
@@ -377,6 +410,25 @@ describe( "RWTQuery", function() {
 
     } );
 
+    describe( "get", function() {
+
+      it( "returns array with html element", function() {
+        var $element = $( element );
+
+        expect( $element.get().length ).toBe( 1 );
+        expect( $element.get()[0] ).toBe( element );
+      } );
+
+      it( "returns element", function() {
+        expect( $( element ).get( 0 ) ).toBe( element );
+      } );
+
+      it( "returns undefined for out of bounds index", function() {
+        expect( $( element ).get( 1 ) ).toBeUndefined();
+      } );
+
+    });
+
     describe( "detach", function() {
 
       it( "removed an element", function() {
@@ -420,6 +472,27 @@ describe( "RWTQuery", function() {
       } );
 
     } );
+
+  } );
+
+  describe( "for html string", function() {
+
+    it( "returns element for single tag without attributes or children", function() {
+      expect( $( "<input>" ).get( 0 ).tagName.toLocaleLowerCase()).toBe( "input" );
+      expect( $( "<p>" ).get( 0 ).tagName.toLocaleLowerCase()).toBe( "p" );
+      expect( $( "<div></div>" ).get( 0 ).tagName.toLocaleLowerCase()).toBe( "div" );
+      expect( $( "<br/>" ).get( 0 ).tagName.toLocaleLowerCase()).toBe( "br" );
+    });
+
+    it( "throws exception for unsupported strings", function() {
+      var message = "Invalid or unsupported HTML string";
+      expect( function(){ $( "not html at all" ) } ).toThrow( message );
+      expect( function(){ $( "#selector" ) } ).toThrow( message );
+      expect( function(){ $( "<br/><br/>" ) } ).toThrow( message );
+      expect( function(){ $( "<div>text</div>" ) } ).toThrow( message );
+      expect( function(){ $( "<div><br/></div>" ) } ).toThrow( message );
+      expect( function(){ $( "<div foo='bar'>" ) } ).toThrow( message );
+    });
 
   } );
 
