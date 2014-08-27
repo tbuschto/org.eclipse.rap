@@ -24,7 +24,8 @@ describe( "RWTQuery", function() {
         "setHtmlAttribute",
         "getHtmlAttributes",
         "setStyleProperty",
-        "getStyleProperties"
+        "getStyleProperties",
+        "set"
       ] );
       widget.classname = "rwt.widgets.Foo";
       spyOn( WidgetUtil, "callWithElement" );
@@ -122,6 +123,41 @@ describe( "RWTQuery", function() {
 
         expect( widget.setStyleProperty ).toHaveBeenCalledWith( "foo", "bar" );
         expect( widget.setStyleProperty ).toHaveBeenCalledWith( "foo2", "bar2" );
+      } );
+
+      it( "uses widgetCssHooks to forward widget-properties indirectly", function() {
+        var spy = jasmine.createSpy();
+        $.widgetCssHooks[ "foo" ] = spy;
+
+        $( widget ).css( "foo", "bar" );
+
+        expect( spy ).toHaveBeenCalledWith( same( widget ), "bar" );
+        delete $.widgetCssHooks.foo;
+      } );
+
+      it( "uses widgetCssHooks to forward widget-properties directly", function() {
+        $.widgetCssHooks[ "foo" ] = "backgroundColor";
+
+        $( widget ).css( "foo", "#ff00ff" );
+
+        expect( widget.set ).toHaveBeenCalledWith( "backgroundColor", "#ff00ff" );
+        delete $.widgetCssHooks.foo;
+      } );
+
+      it( "supports standard css-gradient syntax (like css for element)", function() {
+        var gradient = [ [ 0, "red" ], [ 0.5, "green" ], [ 1, "blue" ] ];
+        gradient.horizontal = false;
+        var gradientStr = "linear-gradient( to bottom, red 0%, green 50%, blue 100% ) ";
+
+        $( widget ).css( "backgroundGradient", gradientStr );
+
+        expect( widget.set ).toHaveBeenCalledWith( "backgroundGradient", gradient );
+      } );
+
+      it( "supports standard css-image syntax (like css for element)", function() {
+        $( widget ).css( "backgroundImage", "uRl( foo )" );
+
+        expect( widget.set ).toHaveBeenCalledWith( "backgroundImage", "foo" );
       } );
 
     } );
@@ -345,10 +381,56 @@ describe( "RWTQuery", function() {
         expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( element, gradient );
       } );
 
+      it( "still allow standard vertical backgroundGradient syntax", function() {
+        spyOn( rwt.html.Style, "setBackgroundGradient" );
+        var gradient = [ [ 0, "red" ], [ 0.5, "green" ], [ 1, "blue" ] ];
+        gradient.horizontal = false;
+        var gradientStr = "linear-gradient( to bottom, red 0%, green 50%, blue 100% ) ";
+
+        $( element ).css( "backgroundGradient", gradientStr );
+
+        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( element, gradient );
+      } );
+
+      it( "still allow standard horizontal backgroundGradient syntax", function() {
+        spyOn( rwt.html.Style, "setBackgroundGradient" );
+        var gradient = [ [ 0, "red" ], [ 0.5, "green" ], [ 1, "blue" ] ];
+        gradient.horizontal = true;
+        var gradientStr = " linear-gradient( to right, red 0% , green 50%, blue 100% ) ";
+
+        $( element ).css( "backgroundGradient", gradientStr );
+
+        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( element, gradient );
+      } );
+
+      it( "does not support any other standard backgroundGradient syntax", function() {
+        var testStr = function( str ) {
+          return function() {
+            $( element ).css( "backgroundGradient", str );
+          };
+        };
+
+        expect( testStr( "linear-gradient()" ) ).toThrow();
+        expect( testStr( "linear-gradient( to bottom )" ) ).toThrow();
+        expect( testStr( "linear-gradien( to bottom, red 0%, green 50%, blue 100% )" ) ).toThrow();
+        expect( testStr( "linear-gradient( to bottom, red d%, green 50%, blue 100% )" ) ).toThrow();
+        expect( testStr( "linear-gradient( 90deg, red 0%, green 50%, blue 100% )" ) ).toThrow();
+        expect( testStr( "linear-gradient( to bottom, red, blue )" ) ).toThrow();
+        expect( testStr( "linear-gradien( to top, red 0%, green 50%, blue 100% )" ) ).toThrow();
+      } );
+
       it( "delegate set backgroundImage", function() {
         spyOn( rwt.html.Style, "setBackgroundImage" );
 
         $( element ).css( "backgroundImage", "foo" );
+
+        expect( rwt.html.Style.setBackgroundImage ).toHaveBeenCalledWith( element, "foo" );
+      } );
+
+      it( "still allow standard backgroundImage syntax", function() {
+        spyOn( rwt.html.Style, "setBackgroundImage" );
+
+        $( element ).css( "backgroundImage", "uRl( foo )" );
 
         expect( rwt.html.Style.setBackgroundImage ).toHaveBeenCalledWith( element, "foo" );
       } );
@@ -486,12 +568,12 @@ describe( "RWTQuery", function() {
 
     it( "throws exception for unsupported strings", function() {
       var message = "Invalid or unsupported HTML string";
-      expect( function(){ $( "not html at all" ) } ).toThrow( message );
-      expect( function(){ $( "#selector" ) } ).toThrow( message );
-      expect( function(){ $( "<br/><br/>" ) } ).toThrow( message );
-      expect( function(){ $( "<div>text</div>" ) } ).toThrow( message );
-      expect( function(){ $( "<div><br/></div>" ) } ).toThrow( message );
-      expect( function(){ $( "<div foo='bar'>" ) } ).toThrow( message );
+      expect( function(){ $( "not html at all" ); } ).toThrow( message );
+      expect( function(){ $( "#selector" ); } ).toThrow( message );
+      expect( function(){ $( "<br/><br/>" ); } ).toThrow( message );
+      expect( function(){ $( "<div>text</div>" ); } ).toThrow( message );
+      expect( function(){ $( "<div><br/></div>" ); } ).toThrow( message );
+      expect( function(){ $( "<div foo='bar'>" ); } ).toThrow( message );
     });
 
   } );

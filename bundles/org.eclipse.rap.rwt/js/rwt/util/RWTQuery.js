@@ -88,21 +88,20 @@ $.fn = $.prototype; // for extendability
 $.fn.init.prototype = $.prototype; // for creation without "new"
 
 // TODO: these hooks are for element only, widgets would need separate ones
-// TODO: have getter, allow for standard syntax on image & gradient
 $.cssHooks = {
   "backgroundColor" : {
     "set" : function( element, value ) {
       rwt.html.Style.setBackgroundColor( element, value );
     }
   },
-  "backgroundImage" : { // standard syntax URL("...") not supported
+  "backgroundImage" : {
     "set" : function( element, value ) {
-      rwt.html.Style.setBackgroundImage( element, value );
+      rwt.html.Style.setBackgroundImage( element, fixBackgroundImage( value ) );
     }
   },
-  "backgroundGradient" : { // standard syntax linear-gradient(...) not supported
+  "backgroundGradient" : {
     "set" : function( element, value ) {
-      rwt.html.Style.setBackgroundGradient( element, value );
+      rwt.html.Style.setBackgroundGradient( element, fixBackgroundGradient( value ) );
     }
   },
   "border" : {
@@ -122,6 +121,21 @@ $.cssHooks = {
         element.style.font = value;
       }
     }
+  }
+};
+
+// NOTE: this list is yet incomplete, extend as needed
+$.widgetCssHooks = {
+  "font" : "font",
+  "border" : "border",
+  "backgroundColor" : "backgroundColor",
+  "color" : "textColor",
+  "opacity" : "opacity",
+  "backgroundImage" : function( widget, value ) {
+    widget.set( "backgroundImage", fixBackgroundImage( value ) );
+  },
+  "backgroundGradient" : function( widget, value ) {
+    widget.set( "backgroundGradient", fixBackgroundGradient( value ) );
   }
 };
 
@@ -167,11 +181,19 @@ var attr_element = unwrapArgsFor( function( element, args ) {
 } );
 
 var css_widget = unwrapArgsFor( function( widget, args ) {
-  // TODO: some of properties such as bounds and backgrounds should be applied to the widget itself
   if( args.length === 1 ) {
     return widget.getStyleProperties()[ args[ 0 ] ];
   }
-  widget.setStyleProperty( args[ 0 ], args[ 1 ] );
+  var hook = $.widgetCssHooks[ args[ 0 ] ];
+  if( hook ) {
+    if( typeof hook === "function" ) {
+      hook( widget, args[ 1 ] );
+    } else {
+      widget.set( hook, args[ 1 ] );
+    }
+  } else {
+    widget.setStyleProperty( args[ 0 ], args[ 1 ] );
+  }
   return this;
 } );
 
@@ -240,7 +262,51 @@ var parseHTML = function( str ) {
   throw new Error( "Invalid or unsupported HTML string" );
 };
 
+var fixBackgroundImage = function( value ) {
+  if( value.trim().toLowerCase().indexOf( "url(" ) === 0 ) {
+    return getCssFunctionParams( "url", value )[ 0 ];
+  }
+  return value;
+};
+
+var fixBackgroundGradient = function( value ) {
+  if( typeof value === "string" ) {
+    var params = getCssFunctionParams("linear-gradient", value);
+    var horizontal = params[ 0 ] === "to right";
+    cssCheck(horizontal || params[ 0 ] === "to bottom");
+    var gradient = [];
+    gradient.horizontal = horizontal;
+    cssCheck(params.length > 2);
+    for(var i = 1; i < params.length; i++) {
+      var stop = trimAll(params[ i ].split(" ").reverse());
+      stop[ 0 ] = parseInt(stop[ 0 ], 10) / 100;
+      cssCheck(!isNaN(stop[ 0 ]));
+      gradient.push(stop);
+    }
+    return gradient;
+  }
+  return value;
+};
+
 var rsingleTag = (/^<(\w+)\s*\/?>(?:<\/\1>|)$/);
 
+var getCssFunctionParams = function( fnName, cssValue ) {
+  var trimmed = cssValue.trim().toLowerCase();
+  var start = fnName + "(";
+  if( trimmed.indexOf( start ) === 0 && trimmed.lastIndexOf( ")" ) === ( trimmed.length - 1 ) ) {
+    return trimAll( trimmed.slice( start.length, -1 ).trim().split( "," ) );
+  }
+  cssCheck( false );
+};
+
+var trimAll = function( arr ) {
+  return arr.map( function( str ){ return str.trim(); } );
+};
+
+var cssCheck = function( passed ) {
+  if( !passed ) {
+    throw new Error( "Invalid or unsupported css value" );
+  }
+};
 
 }());
