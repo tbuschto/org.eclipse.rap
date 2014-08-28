@@ -372,6 +372,14 @@ describe( "RWTQuery", function() {
         expect( rwt.html.Style.setBackgroundColor ).toHaveBeenCalledWith( element, "#ff00ee" );
       } );
 
+      it( "delegate userSelect", function() {
+        spyOn( rwt.html.Style, "setUserSelect" );
+
+        $( element ).css( "userSelect", "none" );
+
+        expect( rwt.html.Style.setUserSelect ).toHaveBeenCalledWith( element, "none" );
+      } );
+
       it( "delegate set backgroundGradient", function() {
         spyOn( rwt.html.Style, "setBackgroundGradient" );
         var gradient = [];

@@ -240,7 +240,7 @@ describe( "Style", function() {
       var imageOffset = background.indexOf( "url(" );
       var gradientOffset = background.indexOf( "gradient" );
       if( colorOffset === -1 ) {
-        var colorOffset = background.indexOf( "#f1f2f3" );
+        colorOffset = background.indexOf( "#f1f2f3" );
       }
       if( Client.isWebkit() ) {
         expect( imageOffset ).toBeLessThan( gradientOffset );
@@ -312,6 +312,19 @@ describe( "Style", function() {
         expect( TestUtil.getCssGradient( element ) ).toBe( vGradientString );
       } );
     }
+
+    describe( "setUserSelect", function() {
+
+      it( "sets user select with vendor prefix", function() {
+        Style.setUserSelect( element, "none" );
+
+        var userSelect =    element.style[ Style.VENDOR_PREFIX_PROPERTY + "UserSelect" ]
+                         || element.style.userSelect;
+        expect( userSelect ).toBe( "none" );
+      } );
+
+    } );
+
 
   } );
 

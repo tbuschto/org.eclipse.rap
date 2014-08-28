@@ -41,9 +41,17 @@ rwt.qx.Class.define( "rwt.html.Style", {
 
   statics : {
 
-    BROWSER_PREFIX : rwt.util.Variant.select( "qx.client", {
+    VENDOR_PREFIX_VALUE : rwt.util.Variant.select( "qx.client", {
       "gecko" : "-moz-",
       "webkit" : "-webkit-",
+      "trident" : "-ms-",
+      "default" : ""
+    } ),
+
+    VENDOR_PREFIX_PROPERTY : rwt.util.Variant.select( "qx.client", {
+      "gecko" : "Moz",
+      "webkit" : "webkit",
+      "trident" : "ms",
       "default" : ""
     } ),
 
@@ -348,7 +356,7 @@ rwt.qx.Class.define( "rwt.html.Style", {
     setBoxShadow: function( target, shadowObject ) {
       var property;
       if( Client.isWebkit() && !Client.isMobileChrome() ) {
-        property = this.BROWSER_PREFIX + "box-shadow";
+        property = this.VENDOR_PREFIX_VALUE + "box-shadow";
       } else {
         property = "boxShadow";
       }
@@ -392,6 +400,10 @@ rwt.qx.Class.define( "rwt.html.Style", {
       }
     },
 
+    setUserSelect : function( target, value ) {
+      this.setStyleProperty( target, this._prefixProperty( "userSelect" ), value );
+    },
+
     setStyleProperty : function( target, property, value ) {
       if( target.setStyleProperty ) {
         target.setStyleProperty( property, value );
@@ -408,26 +420,15 @@ rwt.qx.Class.define( "rwt.html.Style", {
       }
     },
 
-    removeCssFilter : function( target ) {
-      var element = null;
-      if( target instanceof rwt.widgets.base.Widget ) {
-        if( target.isCreated() ) {
-          element = target.getElement();
-        } else {
-          target.removeStyleProperty( "filter" );
-        }
-      } else {
-        element = target;
-      }
-      if( element !== null ) {
-        var cssText = element.style.cssText;
-        cssText = cssText.replace( /FILTER:[^;]*(;|$)/, "" );
-        element.style.cssText = cssText;
-      }
-    },
-
     //////////
     // Private
+
+    _prefixProperty : function( property ) {
+      if( this.VENDOR_PREFIX_PROPERTY ) {
+        return this.VENDOR_PREFIX_PROPERTY + rwt.util.Strings.toFirstUp( property );
+      }
+      return property;
+    },
 
     _updateBackground : function( target ) {
       var background = [];
@@ -488,7 +489,7 @@ rwt.qx.Class.define( "rwt.html.Style", {
           var color = gradientObject[ i ][ 1 ];
           args.push( "color-stop(" + position + "," + color + ")" );
         }
-        return this.BROWSER_PREFIX + "gradient( " + args.join() + ")";
+        return this.VENDOR_PREFIX_VALUE + "gradient( " + args.join() + ")";
       },
       "gecko" : function( gradientObject ) {
         var args = [ gradientObject.horizontal === true ? "0deg" : "-90deg" ];
@@ -497,7 +498,7 @@ rwt.qx.Class.define( "rwt.html.Style", {
           var color = gradientObject[ i ][ 1 ];
           args.push( color + " " + position );
         }
-        return this.BROWSER_PREFIX + "linear-gradient( " + args.join() + ")";
+        return this.VENDOR_PREFIX_VALUE + "linear-gradient( " + args.join() + ")";
       },
       "trident" : function( gradientObject ) {
         if( rwt.client.Client.getMajor() === 9 ) {
@@ -541,17 +542,6 @@ rwt.qx.Class.define( "rwt.html.Style", {
         this.setStyleProperty( target, "background", "rgba(0, 0, 0, 0)" );
       } else {
         this.removeStyleProperty( target, "background" );
-      }
-    },
-
-    _setCssFilterImage : function( target, value ) {
-      if( value ) {
-        var cssImageStr =   "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"
-                          + value
-                          + "',sizingMethod='crop')";
-        this.setStyleProperty( target, "filter", cssImageStr );
-      } else {
-        this.removeCssFilter( target );
       }
     },
 

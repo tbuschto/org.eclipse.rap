@@ -3182,32 +3182,9 @@ rwt.qx.Class.define( "rwt.widgets.base.Widget", {
     /////////////////////
     // SELECTABLE SUPPORT
 
-    _applySelectable : rwt.util.Variant.select("qx.client", {
-      "gecko" : function(value) {
-        if (value) {
-          this.removeStyleProperty("MozUserSelect");
-        } else {
-          this.setStyleProperty("MozUserSelect", "none");
-        }
-      },
-      "webkit" : function(value) {
-        if (value) {
-          this.removeStyleProperty("WebkitUserSelect");
-          this.removeStyleProperty("KhtmlUserSelect");
-        } else {
-          this.setStyleProperty("WebkitUserSelect", "none");
-          this.setStyleProperty("KhtmlUserSelect", "none");
-        }
-      },
-      // Opera currently has no support to prohibit user selection
-      "default" : function(value) {
-        if (value) {
-          return this.removeStyleProperty("userSelect");
-        } else {
-          this.setStyleProperty("userSelect", "none");
-        }
-      }
-    } ),
+    _applySelectable : function( value ) {
+      rwt.html.Style.setUserSelect( this, value );
+    },
 
     //////////////////
     // OPACITY SUPPORT

@@ -94,6 +94,11 @@ $.cssHooks = {
       rwt.html.Style.setBackgroundColor( element, value );
     }
   },
+  "userSelect" : {
+    "set" : function( element, value ) {
+      rwt.html.Style.setUserSelect( element, value );
+    }
+  },
   "backgroundImage" : {
     "set" : function( element, value ) {
       rwt.html.Style.setBackgroundImage( element, fixBackgroundImage( value ) );
@@ -131,6 +136,7 @@ $.widgetCssHooks = {
   "backgroundColor" : "backgroundColor",
   "color" : "textColor",
   "opacity" : "opacity",
+  "userSelect" : "selectable",
   "backgroundImage" : function( widget, value ) {
     widget.set( "backgroundImage", fixBackgroundImage( value ) );
   },
