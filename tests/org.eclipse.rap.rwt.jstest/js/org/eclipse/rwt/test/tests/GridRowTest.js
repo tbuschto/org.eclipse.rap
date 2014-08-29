@@ -27,6 +27,18 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
     _gradient : [ [ 0, "red" ], [ 1, "yellow" ] ],
 
+    setUp : function() {
+      this._createTree();
+      this._createRow();
+    },
+
+    tearDown : function() {
+      tree.destroy();
+      tree = null;
+      row.destroy();
+      row = null;
+    },
+
     testCreateRow : function() {
       assertTrue( row.isCreated() );
       assertEquals( "hidden", row.getOverflow() );
@@ -3274,18 +3286,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
     _getOverlayElement : function( row ) {
       return row._overlayElement;
-    },
-
-    setUp : function() {
-      this._createTree();
-      this._createRow();
-    },
-
-    tearDown : function() {
-      tree.destroy();
-      tree = null;
-      row.destroy();
-      row = null;
     }
 
   }

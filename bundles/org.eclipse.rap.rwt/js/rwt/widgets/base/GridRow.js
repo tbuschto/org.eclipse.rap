@@ -14,7 +14,7 @@
  * Represents a visible TreeItem.
  */
 
-(function() {
+(function( $ ) {
 
 var Style = rwt.html.Style;
 
@@ -22,14 +22,17 @@ var cellRenderer = rwt.widgets.util.CellRendererRegistry.getInstance().getAll();
 
 rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
-  extend : rwt.widgets.base.Terminator,
+  extend : rwt.qx.Target,
 
   construct : function() {
     this.base( arguments );
-    this.setSelectable( false ); // Prevents user from selecting text
-    this.setOverflow( "hidden" );
-    this.setHeight( 16 );
+    this.$el = $( "<div>" ).css( {
+      "overflow" : "hidden",
+      "userSelect" : "none",
+      "height" : 16
+    });
     this._styleMap = {};
+    this._appearance = null;
     this._overlayStyleMap = {};
     this._elementStyleCache = {};
     this._variant = null;
@@ -137,6 +140,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       return rwt.widgets.util.GridCellToolTipSupport.getCurrentToolTipTargetBounds( this );
     },
 
+    setAppearance : function( appearance ) {
+      this._appearance = appearance;
+    },
+
     ////////////
     // internals
 
@@ -227,19 +234,19 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
     _getStyleMap : function() {
       var manager = rwt.theme.AppearanceManager.getInstance();
-      return manager.styleFrom( this.getAppearance(), this.__states );
+      return manager.styleFrom( this._appearance, this.__states );
     },
 
     _getOverlayStyleMap : function() {
       var manager = rwt.theme.AppearanceManager.getInstance();
-      return manager.styleFrom( this.getAppearance() + "-overlay", this.__states );
+      return manager.styleFrom( this._appearance + "-overlay", this.__states );
     },
 
     _getTreeColumnStyleMap : function( selected ) {
       var manager = rwt.theme.AppearanceManager.getInstance();
-      var overlayMap = manager.styleFrom( this.getAppearance() + "-overlay", this.__states );
+      var overlayMap = manager.styleFrom( this._appearance + "-overlay", this.__states );
       if( selected ) {
-        var rowMap = manager.styleFrom( this.getAppearance(), this.__states );
+        var rowMap = manager.styleFrom( this._appearance, this.__states );
         overlayMap.rowForeground = rowMap.foreground;
       } else {
         overlayMap.rowForeground = "undefined";
@@ -332,7 +339,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     },
 
     _getImageFromAppearance : function( image, states ) {
-      var appearance = this.getAppearance() + "-" + image;
+      var appearance = this._appearance + "-" + image;
       var manager = rwt.theme.AppearanceManager.getInstance();
       var styleMap = manager.styleFrom( appearance, states );
       var valid = styleMap && styleMap.backgroundImage;
@@ -1045,4 +1052,4 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
 } );
 
-}());
+}( rwt.util.RWTQuery ));

@@ -14,6 +14,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
   construct : function() {
     this.base( arguments );
+    this.$el = new rwt.util.RWTQuery( this );
     this.setOverflow( "hidden" );
     this._scrollLeft = 0;
     this._rowHeight = 16;
@@ -342,12 +343,14 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         if( this._cellToolTipsEnabled ) {
           row.setToolTipText( "" );
         }
-        row.setZIndex( 0 );
-        row.setWidth( this._rowWidth );
-        row.setHeight( this._rowHeight );
-        row.setBorder( this._rowBorder );
+        row.$el.css( {
+          "zIndex": 0,
+          "width": this._rowWidth,
+          "height": this._rowHeight,
+          "border": this._rowBorder
+        } );
         row.setState( "linesvisible", this._config.linesVisible );
-        this.add( row );
+        this.$el.append( row.$el );
       }
       while( this._children.length > rowsNeeded ) {
         this._children[ this._children.length - 1 ].destroy();

@@ -491,6 +491,14 @@ describe( "RWTQuery", function() {
         expect( childElement.parentElement ).toBe( element );
       } );
 
+      it( "appends an RWTQuery instance", function() {
+        var childElement = document.createElement( "div" );
+
+        $( element ).append( $( childElement ) );
+
+        expect( childElement.parentElement ).toBe( element );
+      } );
+
       it( "isChainable", function() {
         var childElement = document.createElement( "div" );
         var $element = $( element );

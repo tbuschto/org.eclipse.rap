@@ -37,15 +37,16 @@ $.prototype = {
     }
     var isWidget = ( target.classname || "" ).indexOf( "rwt.widgets" ) === 0;
     this.__access = function( args, callbackWidget, callbackElement ) {
-      var callback = callbackElement;
       if( isWidget ) {
         if( callbackWidget ) {
-          callback = callbackWidget;
+          return callbackWidget.apply( this, [ target, args ] );
         } else {
-          target = get_widget.apply( this, [ target, [ 0 ] ] );
+          debugger;
+          var element = get_widget.apply( this, [ target, [ 0 ] ] )
+          return callbackElement.apply( this, [ element, args ] );
         }
       }
-      return callback.apply( this, [ target, args ] );
+      return callbackElement.apply( this, [ target, args ] );
     };
   },
 
@@ -111,7 +112,7 @@ $.cssHooks = {
   },
   "border" : {
     "set" : function( element, value ) {
-      if( typeof value === "object" && value.renderElement ) {
+      if( value && typeof value === "object" && value.renderElement ) {
         value.renderElement( element );
       } else {
         element.style.border = value;
@@ -120,7 +121,7 @@ $.cssHooks = {
   },
   "font" : {
     "set" : function( element, value ) {
-      if( typeof value === "object" && value.renderElement ) {
+      if( value && typeof value === "object" && value.renderElement ) {
         value.renderElement( element );
       } else {
         element.style.font = value;
@@ -129,13 +130,20 @@ $.cssHooks = {
   }
 };
 
-// NOTE: this list is yet incomplete, extend as needed
+// NOTE: this list is still incomplete, extend as needed
 $.widgetCssHooks = {
   "font" : "font",
   "border" : "border",
   "backgroundColor" : "backgroundColor",
   "color" : "textColor",
+  "left" : "left",
+  "top" : "top",
+  "width" : "width",
+  "height" : "height",
+  "bottom" : "bottom",
+  "right" : "right",
   "opacity" : "opacity",
+  "overflow" : "overflow",
   "userSelect" : "selectable",
   "backgroundImage" : function( widget, value ) {
     widget.set( "backgroundImage", fixBackgroundImage( value ) );
@@ -216,7 +224,8 @@ var css_element = unwrapArgsFor( function( element, args ) {
 } );
 
 var append_element = function( element, args ) {
-  element.appendChild( args[ 0 ] );
+  var child = args[ 0 ] instanceof $ ? args[ 0 ].get( 0 ) : args[ 0 ];
+  element.appendChild( child );
   return this;
 };
 
