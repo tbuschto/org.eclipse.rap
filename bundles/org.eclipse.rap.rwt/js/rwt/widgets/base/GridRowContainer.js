@@ -14,7 +14,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
   construct : function() {
     this.base( arguments );
-    this.$el = new rwt.util.RWTQuery( this );
+    this.$el = new rwt.util._RWTQuery( this );
     this.setOverflow( "hidden" );
     this._scrollLeft = 0;
     this._rowHeight = 16;
@@ -123,14 +123,14 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     setRowWidth : function( width ) {
       this._rowWidth = width;
       for( var i = 0; i < this._children.length; i++ ) {
-        this._children[ i ].setWidth( width );
+        this.row( i ).setWidth( width );
       }
     },
 
     setRowHeight : function( height ) {
       this._rowHeight = height;
       for( var i = 0; i < this._children.length; i++ ) {
-        this._children[ i ].setHeight( height );
+        this.row( i ).setHeight( height );
       }
       this._updateRowCount();
     },
@@ -139,9 +139,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       this._cellToolTipsEnabled = value;
       for( var i = 0; i < this._children.length; i++ ) {
         if( value ) {
-          this._children[ i ].setToolTipText( "" );
+          this.row( i ).setToolTipText( "" );
         } else {
-          this._children[ i ].resetToolTipText();
+          this.row( i ).resetToolTipText();
         }
       }
     },
@@ -154,9 +154,17 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       var border = this._config.linesVisible ? this._getHorizontalGridBorder() : null;
       this._rowBorder = border;
       for( var i = 0; i < this._children.length; i++ ) {
-        this._children[ i ].setBorder( border );
-        this._children[ i ].setState( "linesvisible", this._config.linesVisible );
+        this.row( i ).setBorder( border );
+        this.row( i ).setState( "linesvisible", this._config.linesVisible );
       }
+    },
+
+    rowCount : function() {
+      return this.$el.prop( "childElementCount" );
+    },
+
+    row : function( index ) {
+      return this.$el.prop( "children" )[ index ][ "row" ];
     },
 
     _renderGridVertical : function() {
@@ -252,10 +260,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         this._topItemIndex = index;
         var forwards = delta > 0;
         delta = Math.abs( delta );
-        if( delta >= this._children.length ) {
+        if( delta >= this.rowCount() ) {
           this._renderAll( true );
         } else {
-          var numberOfShiftingRows = this._children.length - delta;
+          var numberOfShiftingRows = this.rowCount() - delta;
           var updateFromRow = forwards ? numberOfShiftingRows : 0;
           var newFirstRow = forwards ? delta : numberOfShiftingRows;
           this._switchRows( newFirstRow );
@@ -276,7 +284,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         var item = queue[ key ];
         var index = this._items.indexOf( item );
         if( index !== -1 ) {
-          this._renderRow( this._children[ index ], item );
+          this._renderRow( this.row( index ), item );
         }
       }
     },
@@ -322,7 +330,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         this._renderGridVertical();
       }
       var start = ( new Date() ).getTime();
-      this._updateRows( 0, this._children.length, contentOnly );
+      this._updateRows( 0, this.rowCount(), contentOnly );
       this._renderBounds();
       if( this._postRender ) { // TODO : remove with IE8 support
         var postRender = this._postRender;
@@ -337,7 +345,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _updateRowCount : function() {
       var rowsNeeded = Math.round( ( this.getHeight() / this._rowHeight ) + 0.5 );
-      while( this._children.length < rowsNeeded ) {
+      while( this.rowCount() < rowsNeeded ) {
         var row = new rwt.widgets.base.GridRow( this.getParent() );
         row.setAppearance( this._getRowAppearance() );
         if( this._cellToolTipsEnabled ) {
@@ -352,22 +360,22 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         row.setState( "linesvisible", this._config.linesVisible );
         this.$el.append( row.$el );
       }
-      while( this._children.length > rowsNeeded ) {
-        this._children[ this._children.length - 1 ].destroy();
+      while( this.rowCount() > rowsNeeded ) {
+        this._children[ this.rowCount() - 1 ].destroy();
       }
-      this._items.length = this._children.length;
+      this._items.length = this.rowCount();
       this._updateRowsEvenState();
     },
 
     _updateRowsEvenState: function() {
-      for( var i = 0; i < this._children.length; i++ ) {
-        this._children[ i ].updateEvenState( this._topItemIndex + i );
+      for( var i = 0; i < this.rowCount(); i++ ) {
+        this.row( i ).updateEvenState( this._topItemIndex + i );
       }
     },
 
     _findRowByItem : function( targetItem ) {
       var index = this._items.indexOf( targetItem );
-      return index !== -1 ? this._children[ index ] : null;
+      return index !== -1 ? this.row( index ) : null;
     },
 
     _updateRows : function( from, delta, contentOnly ) {
@@ -375,7 +383,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       var item = this._topItem;
       var to = from + delta;
       var row = 0;
-      while( item != null && row < this._children.length ) {
+      while( item != null && row < this.rowCount() ) {
         if( row >= from && row <= to ) {
           this._renderRow( this._children[ row ], item, contentOnly );
           this._items[ row ] = item;
@@ -383,8 +391,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         item = item.getNextItem();
         row++;
       }
-      for( var i = row; i < this._children.length; i++ ) {
-        this._renderRow( this._children[ i ], null, contentOnly );
+      for( var i = row; i < this.rowCount(); i++ ) {
+        this._renderRow( this.row( i ), null, contentOnly );
         this._items[ i ] = null;
       }
     },
@@ -407,11 +415,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _renderBounds : function( renderLocation ) {
       if( renderLocation ) {
-        for( var i = 0; i < this._children.length; i++ ) {
-          this._children[ i ].addToLayoutChanges( "locationY" );
+        for( var i = 0; i < this.rowCount(); i++ ) {
+          this.row( i ).addToLayoutChanges( "locationY" );
         }
       }
-      //this.getLayoutImpl().layoutChild( this._children[ i ], changes );
+      //this.getLayoutImpl().layoutChild( this.row( i ), changes );
       this._flushChildrenQueue();
     },
 

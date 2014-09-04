@@ -31,6 +31,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       "userSelect" : "none",
       "height" : 16
     });
+    this.$el.prop( "row", this );
     this._styleMap = {};
     this._appearance = null;
     this._overlayStyleMap = {};
@@ -40,6 +41,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     this._checkBoxElement = null;
     this._overlayElement = null;
     this._treeColumnElements = [];
+    this._lastAttributes = {};
     this._cellLabels = [];
     this._cellImages = [];
     this._cellCheckImages = [];
@@ -51,6 +53,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
   },
 
   destruct : function() {
+    this.$el.removeProp( "row" );
     this._expandElement = null;
     this._checkBoxElement = null;
     this._treeColumnElements = null;
@@ -86,9 +89,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
         this._hideRemainingElements();
       } else {
         var contentOnly = scrolling || !config;
-        this.setBackgroundColor( null );
-        this.setBackgroundImage( null );
-        this.setBackgroundGradient( null );
+        this.$el.css( {
+          "backgroundColor" : "",
+          "backgroundImage" : "",
+          "backgroundGradient" : ""
+       } );
         if( config.rowTemplate ) {
           this._renderTemplate( null, config );
           this._hideRemainingElements();
@@ -114,7 +119,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
         var cell = this._cellCheckImages.indexOf( node );
         result = [ "cellCheckBox", cell ];
       } else {
-        while( node !== this.getElement() && result[ 0 ] === "other" ) { // Can be removed?
+        while( node !== this.$el.get( 0 ) && result[ 0 ] === "other" ) { // Can be removed?
           if( this._treeColumnElements.indexOf( node ) != -1 ) {
             result = [ "treeColumn" ]; // TODO [tb] : now should be [ "label", 0 ] / [ "image", 0 ]
           } else if( this._templateRenderer ) {
@@ -144,6 +149,29 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       this._appearance = appearance;
     },
 
+    setWidth : function( width ) {
+      this.$el.css( "width", width );
+    },
+
+    setHeight : function( height ) {
+      this.$el.css( "height", height );
+    },
+
+    getWidth : function() {
+      // Do NOT use anything like offsetWidth/outerWidth/clientRectBounds for this, it would
+      // force rendering and potentially impact performance!
+      return parseInt( this.$el.css( "height" ) || "0" );
+    },
+
+    getHeight : function() {
+      return parseInt( this.$el.css( "height" ) || "0" );
+    },
+
+    isSeeable : function() {
+      // TODO [tb] : Only works in FF 9 or higher. Either raise requirements or create polyfill
+      return document.body.contains( this.$el.get( 0 ) );
+    },
+
     ////////////
     // internals
 
@@ -169,7 +197,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       if( this._templateRenderer == null ) {
         this._templateRenderer = new rwt.widgets.util.TemplateRenderer(
           config.rowTemplate,
-          this._getTargetNode(),
+          this.$el.get( 0 ),
           100
         );
       }
@@ -232,6 +260,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       }
     },
 
+    hasState : function( state ) {
+      return this.__states && this.__states[ state ] ? true : false;
+    },
+
     _getStyleMap : function() {
       var manager = rwt.theme.AppearanceManager.getInstance();
       return manager.styleFrom( this._appearance, this.__states );
@@ -270,9 +302,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
         gradient = null;
       }
       // Note: "undefined" is a string stored in the themestore
-      this.setBackgroundColor( color !== "undefined" ? color : null );
-      this.setBackgroundImage( image !== "undefined" ? image : null );
-      this.setBackgroundGradient( gradient !== "undefined" ? gradient : null );
+      this.$el.css( {
+        "backgroundColor" :  color !== "undefined" ? color : "",
+        "backgroundImage" : image !== "undefined" ? image : "",
+        "backgroundGradient" : gradient !== "undefined" ? gradient : ""
+      } );
     },
 
     _hasOverlayBackground : function( config ) {
@@ -594,11 +628,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     },
 
     _renderItemForeground : function( item, config ) {
-      this._setForeground( this._getTargetNode(), this._getItemColor( item, config ) );
+      this._setForeground( this.$el.get( 0 ), this._getItemColor( item, config ) );
     },
 
     _renderItemFont : function( item, config ) {
-      var element = this.getElement();
+      var element = this.$el.get( 0 );
       if( this._elementStyleCache.font !== config.font ) {
         this._elementStyleCache.font = config.font;
         this._setFont( element, config.font );
@@ -618,13 +652,14 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     },
 
     _renderHtmlAttributes : function( item, config ) {
-      this.clearHtmlAttributes();
+      this.$el.removeAttr( Object.keys( this._lastAttributes ).join( " " ) );
       var attributes = item ? item.getHtmlAttributes() : {};
       if( attributes[ "id" ] && config.containerNumber === 1 ) {
         attributes = rwt.util.Objects.copy( attributes );
         attributes[ "id" ] += "-1";
       }
-      this.setHtmlAttributes( attributes );
+      this.$el.attr( attributes );
+      this._lastAttributes = attributes;
     },
 
     _getCellBackgroundColor : function( item, cell, config ) {
@@ -862,7 +897,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       result.style.position = "absolute";
       result.style.overflow = "hidden";
       result.style.zIndex = zIndex;
-      this._getTargetNode().appendChild( result );
+      this.$el.get( 0 ).appendChild( result );
       return result;
     },
 
@@ -928,7 +963,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     _removeNode : function( arr, pos ) {
       var node = arr[ pos ];
       if( node ) {
-        this._getTargetNode().removeChild( node );
+        this.$el.get( 0 ).removeChild( node );
         arr[ pos ] = null;
       }
     },
@@ -1052,4 +1087,4 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
 } );
 
-}( rwt.util.RWTQuery ));
+}( rwt.util._RWTQuery ));

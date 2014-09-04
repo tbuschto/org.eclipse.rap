@@ -75,12 +75,35 @@ describe( "RWTQuery", function() {
         expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "foo2", "bar2" );
       } );
 
-      it( "does not set forbidden attributes", function() {
+      it( "does set forbidden attributes if privileged", function() {
+        var $ = rwt.util._RWTQuery;
         $( widget ).attr( "id", "foo" );
         $( widget ).attr( "style", "bar" );
         $( widget ).attr( "class", "foobar" );
 
-        expect( widget.setHtmlAttribute ).not.toHaveBeenCalled();
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "id", "foo" );
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "style", "bar" );
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "class", "foobar" );
+      } );
+
+      it( "can be removed by removeAttr", function() {
+        widget.setHtmlAttribute( "foo", "bar" );
+
+        $( widget ).removeAttr( "foo" );
+
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "foo", null );
+      } );
+
+      it( "can all be removed by single removeAttr", function() {
+        widget.setHtmlAttribute( "foo", "bar" );
+        widget.setHtmlAttribute( "foo-two", "bar-two" );
+        widget.setHtmlAttribute( "foo-three", "bar-three" );
+
+        $( widget ).removeAttr( " foo foo-two foo-three  " );
+
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "foo", null );
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "foo-two", null );
+        expect( widget.setHtmlAttribute ).toHaveBeenCalledWith( "foo-three", null );
       } );
 
     } );
@@ -253,6 +276,45 @@ describe( "RWTQuery", function() {
       element = null;
     } );
 
+
+    describe( "prop", function() {
+
+      it( "sets a new element property", function() {
+        $( element ).prop( "foo", "bar" );
+        expect( element.foo ).toBe( "bar" );
+      } );
+
+      it( "sets a element DOM property", function() {
+        $( element ).prop( { "className" : "bar" } );
+        expect( element.className ).toBe( "bar" );
+      } );
+
+      it( "returns a new element property", function() {
+        element.foo = "bar";
+        expect( $( element ).prop(   "foo" ) ).toBe( "bar" );
+      } );
+
+      it( "returns an element DOM property", function() {
+        element.className = "bar";
+        expect( $( element ).prop( "className" ) ).toBe( "bar" );
+      } );
+
+      it( "can be removed by removeProp", function() {
+        element.foo = "bar";
+        $( element ).removeProp( "foo" );
+
+        expect( "foo" in element ).toBeFalsy();
+      } );
+
+      it( "of DOM can be reset by removeProp", function() {
+        element.className = "bar";
+        $( element ).removeProp( "className" );
+
+        expect( element.className ).toBeFalsy();
+      } );
+
+    } );
+
     describe( "attr", function() {
 
       it( "returns existing attribute", function() {
@@ -301,6 +363,36 @@ describe( "RWTQuery", function() {
         expect( element.getAttribute( "id" ) ).toBeFalsy();
         expect( element.getAttribute( "style" ) ).toBeFalsy();
         expect( element.getAttribute( "class" ) ).toBeFalsy();
+      } );
+
+      it( "does set forbidden attributes if privileged", function() {
+        var $ = rwt.util._RWTQuery;
+        $( element ).attr( "id", "foo" );
+        $( element ).attr( "style", "bar" );
+        $( element ).attr( "class", "foobar" );
+
+        expect( element.getAttribute( "id" ) ).toBe( "foo" );
+        expect( element.getAttribute( "style" ) ).toBe( "bar" );
+        expect( element.getAttribute( "class" ) ).toBe( "foobar" );
+      } );
+
+      it( "can be removed by removeAttr", function() {
+        element.setAttribute( "foo", "bar" );
+        $( element ).removeAttr( "foo" );
+
+        expect( element.hasAttribute( "foo" ) ).toBeFalsy();
+      } );
+
+      it( "can all be removed by single removeAttr", function() {
+        element.setAttribute( "foo", "bar" );
+        element.setAttribute( "foo-two", "bar-two" );
+        element.setAttribute( "foo-three", "bar-three" );
+
+        $( element ).removeAttr( " foo foo-two foo-three  " );
+
+        expect( element.hasAttribute( "foo" ) ).toBeFalsy();
+        expect( element.hasAttribute( "foo-two" ) ).toBeFalsy();
+        expect( element.hasAttribute( "foo-three" ) ).toBeFalsy();
       } );
 
     } );

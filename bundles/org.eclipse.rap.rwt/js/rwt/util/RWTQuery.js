@@ -27,11 +27,16 @@ rwt.util.RWTQuery = function( target ) {
   return new rwt.util.RWTQuery.fn.init( target );
 };
 
+rwt.util._RWTQuery = function( target ) {
+  // TODO: If more methods are going to be made public almost all will also need restrictions
+  return new rwt.util.RWTQuery.fn.init( target, true );
+};
+
 var $ = rwt.util.RWTQuery;
 
 $.prototype = {
 
-  init : function( target ) {
+  init : function( target, privileged ) {
     if( typeof target === "string" ) {
       target = parseHTML( target );
     }
@@ -39,14 +44,13 @@ $.prototype = {
     this.__access = function( args, callbackWidget, callbackElement ) {
       if( isWidget ) {
         if( callbackWidget ) {
-          return callbackWidget.apply( this, [ target, args ] );
+          return callbackWidget.apply( this, [ target, args, privileged ] );
         } else {
-          debugger;
-          var element = get_widget.apply( this, [ target, [ 0 ] ] )
-          return callbackElement.apply( this, [ element, args ] );
+          var element = get_widget.apply( this, [ target, [ 0 ] ] );
+          return callbackElement.apply( this, [ element, args, privileged ] );
         }
       }
-      return callbackElement.apply( this, [ target, args ] );
+      return callbackElement.apply( this, [ target, args, privileged ] );
     };
   },
 
@@ -61,6 +65,18 @@ $.prototype = {
    */
   attr : function() {
     return this.__access( arguments, attr_widget, attr_element );
+  },
+
+  removeAttr : function() {
+    return this.__access( arguments, removeAttr_widget, removeAttr_element );
+  },
+
+  prop : function() {
+    return this.__access( arguments, null, prop_element );
+  },
+
+  removeProp : function() {
+    return this.__access( arguments, null, removeProp_element );
   },
 
   append : function() {
@@ -163,38 +179,77 @@ $.cssNumber = {
   "zoom" : true
 };
 
-var unwrapArgsFor = function( originalSetter ) {
-  return function( target, args ) {
+var unwrapSetterArgsFor = function( originalSetter ) {
+  return function( target, args, privileged ) {
     if( args.length === 1 && ( typeof args[ 0 ] === "object" ) ) {
       var map = args[ 0 ];
       for( var key in map ) {
-        originalSetter.apply( this, [ target, [ key, map[ key ] ] ] );
+        originalSetter.apply( this, [ target, [ key, map[ key ], privileged ] ] );
       }
       return this;
     }
-    return originalSetter.apply( this, arguments );
+    return originalSetter.apply( this, [ arguments[ 0 ], arguments[ 1 ], privileged ] );
   };
 };
 
-var attr_widget = unwrapArgsFor( function( widget, args ) {
+var unwrapStringListFor = function( originalHandler ) {
+  return function( target, args, privileged ) {
+    var arr = args[ 0 ].trim().split( " " );
+    for( var i = 0; i < arr.length; i++ ) {
+      if( arr[ i ] || arr[ i ].length > 0 ) {
+        originalHandler.apply( this, [ target, arr[ i ], privileged ] );
+      }
+    }
+    return this;
+  };
+};
+
+var attr_widget = unwrapSetterArgsFor( function( widget, args, privileged ) {
   if( args.length === 1 ) {
     return widget.getHtmlAttributes()[ args[ 0 ] ];
-  } else if( !restrictedAttributes[ args[ 0 ] ] ) {
+  } else if( privileged || !restrictedAttributes[ args[ 0 ] ] ) {
     widget.setHtmlAttribute( args[ 0 ], args[ 1 ] );
   }
   return this;
 } );
 
-var attr_element = unwrapArgsFor( function( element, args ) {
+var attr_element = unwrapSetterArgsFor( function( element, args, privileged ) {
   if( args.length === 1 ) {
     return element.getAttribute( args[ 0 ] ) || undefined;
-  } else if( !restrictedAttributes[ args[ 0 ] ] ) {
+  } else if( privileged || !restrictedAttributes[ args[ 0 ] ] ) {
     element.setAttribute( args[ 0 ], args[ 1 ] );
   }
   return this;
 } );
 
-var css_widget = unwrapArgsFor( function( widget, args ) {
+var removeAttr_widget = unwrapStringListFor( function( widget, arg ) {
+  widget.setHtmlAttribute( arg, null );
+} );
+
+var removeAttr_element = unwrapStringListFor( function( element, arg ) {
+  element.removeAttribute( arg );
+} );
+
+var prop_element = unwrapSetterArgsFor( function( element, args ) {
+  if( args.length === 1 ) {
+    return element[ args[ 0 ] ];
+  } else {
+    element[ args[ 0 ] ] = args[ 1 ];
+  }
+  return this;
+} );
+
+var removeProp_element = unwrapSetterArgsFor( function( element, args ) {
+  try {
+    element[ args[ 0 ] ] = undefined;
+    delete element[ args[ 0 ] ];
+  } catch( ex ) {
+    // some properties can not be deleted
+  }
+  return this;
+} );
+
+var css_widget = unwrapSetterArgsFor( function( widget, args ) {
   if( args.length === 1 ) {
     return widget.getStyleProperties()[ args[ 0 ] ];
   }
@@ -211,7 +266,7 @@ var css_widget = unwrapArgsFor( function( widget, args ) {
   return this;
 } );
 
-var css_element = unwrapArgsFor( function( element, args ) {
+var css_element = unwrapSetterArgsFor( function( element, args ) {
   var hooks = $.cssHooks[ args[ 0 ] ];
   if( args.length === 1 ) {
     return Style.get( element, args[ 0 ] );
@@ -285,7 +340,7 @@ var fixBackgroundImage = function( value ) {
 };
 
 var fixBackgroundGradient = function( value ) {
-  if( typeof value === "string" ) {
+  if( value && typeof value === "string" ) {
     var params = getCssFunctionParams("linear-gradient", value);
     var horizontal = params[ 0 ] === "to right";
     cssCheck(horizontal || params[ 0 ] === "to bottom");
