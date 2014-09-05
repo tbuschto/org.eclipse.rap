@@ -53,7 +53,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
   },
 
   destruct : function() {
-    this.$el.removeProp( "row" );
+    this.$el.removeProp( "row" ).detach();
+    this.$el = null;
     this._expandElement = null;
     this._checkBoxElement = null;
     this._treeColumnElements = null;
@@ -108,8 +109,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       this.dispatchSimpleEvent( "itemRendered", item );
     },
 
-    getTargetIdentifier : function( event ) {
-      var node = event.getDomTarget();
+    identify : function( node ) {
       var result = [ "other" ];
       if( this._expandElement !== null && this._expandElement === node ) {
         result = [ "expandIcon" ];
@@ -160,7 +160,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     getWidth : function() {
       // Do NOT use anything like offsetWidth/outerWidth/clientRectBounds for this, it would
       // force rendering and potentially impact performance!
-      return parseInt( this.$el.css( "height" ) || "0" );
+      return parseInt( this.$el.css( "width" ) || "0" );
     },
 
     getHeight : function() {
@@ -169,6 +169,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
     isSeeable : function() {
       // TODO [tb] : Only works in FF 9 or higher. Either raise requirements or create polyfill
+      // TODO [tb] : use renderConfig instead
       return document.body.contains( this.$el.get( 0 ) );
     },
 
@@ -303,9 +304,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       }
       // Note: "undefined" is a string stored in the themestore
       this.$el.css( {
-        "backgroundColor" :  color !== "undefined" ? color : "",
-        "backgroundImage" : image !== "undefined" ? image : "",
-        "backgroundGradient" : gradient !== "undefined" ? gradient : ""
+        "backgroundColor" :  color !== "undefined" ? color || "" : "",
+        "backgroundImage" : image !== "undefined" ? image || "" : "",
+        "backgroundGradient" : gradient !== "undefined" || "" ? gradient : ""
       } );
     },
 

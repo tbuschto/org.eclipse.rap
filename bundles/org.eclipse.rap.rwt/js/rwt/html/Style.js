@@ -114,7 +114,6 @@ rwt.qx.Class.define( "rwt.html.Style", {
         }
       },
 
-
     /**
      * Get a (CSS) style property of a given DOM element and interpret the property as integer value
      *
@@ -292,6 +291,20 @@ rwt.qx.Class.define( "rwt.html.Style", {
       }
     },
 
+    getBackgroundGradient : function( target ) {
+      var gradient = target.___rwtStyle__backgroundGradient;
+      if( !gradient ) {
+        return undefined;
+      }
+      var args = [ gradient.horizontal === true ? "to right" : "to bottom" ];
+      for( var i = 0; i < gradient.length; i++ ) {
+        var position = ( gradient[ i ][ 0 ] * 100 ) + "%";
+        var color = gradient[ i ][ 1 ];
+        args.push( " " + color + " " + position );
+      }
+      return "linear-gradient( " + args.join() + " )";
+    },
+
     /**
      * Sets the given image url as a background for the target element/widget.
      * If a background color is set, the image is rendered on top of it.
@@ -306,6 +319,13 @@ rwt.qx.Class.define( "rwt.html.Style", {
       }
     },
 
+    getBackgroundImage : function( target ) {
+      var image = target.___rwtStyle__backgroundImage;
+      if( !image ) {
+        return "none";
+      }
+      return "url(" + image + ")";
+    },
 
     setBackgroundRepeat : function( target, repeat ) {
       if( target.___rwtStyle__backgroundRepeat !== repeat ) {
@@ -404,6 +424,10 @@ rwt.qx.Class.define( "rwt.html.Style", {
       this.setStyleProperty( target, this._prefixProperty( "userSelect" ), value );
     },
 
+    getUserSelect : function( target ) {
+      return this.getOwnProperty( target, this._prefixProperty( "userSelect" ) );
+    },
+
     setStyleProperty : function( target, property, value ) {
       if( target.setStyleProperty ) {
         target.setStyleProperty( property, value );
@@ -417,6 +441,14 @@ rwt.qx.Class.define( "rwt.html.Style", {
         target.removeStyleProperty( property );
       } else {
         target.style[ property ] = "";
+      }
+    },
+
+    getOwnProperty : function( target, property ) {
+      if( target.getStyleProperty ) {
+        target.getStyleProperty( property );
+      } else {
+        return target.style[ property ];
       }
     },
 

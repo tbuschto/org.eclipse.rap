@@ -25,6 +25,7 @@ describe( "RWTQuery", function() {
         "getHtmlAttributes",
         "setStyleProperty",
         "getStyleProperties",
+        "getBackgroundColor",
         "set"
       ] );
       widget.classname = "rwt.widgets.Foo";
@@ -150,7 +151,7 @@ describe( "RWTQuery", function() {
 
       it( "uses widgetCssHooks to forward widget-properties indirectly", function() {
         var spy = jasmine.createSpy();
-        $.widgetCssHooks[ "foo" ] = spy;
+        $.widgetCssHooks[ "foo" ] = { "set" : spy };
 
         $( widget ).css( "foo", "bar" );
 
@@ -164,6 +165,28 @@ describe( "RWTQuery", function() {
         $( widget ).css( "foo", "#ff00ff" );
 
         expect( widget.set ).toHaveBeenCalledWith( "backgroundColor", "#ff00ff" );
+        delete $.widgetCssHooks.foo;
+      } );
+
+      it( "uses widgetCssHooks to retrieve widget-properties directly", function() {
+        $.widgetCssHooks[ "foo" ] = "backgroundColor";
+        widget.getBackgroundColor.andReturn( "red" );
+
+        var result = $( widget ).css( "foo" );
+
+        expect( widget.getBackgroundColor ).toHaveBeenCalled();
+        expect( result ).toBe( "red" );
+        delete $.widgetCssHooks.foo;
+      } );
+
+      it( "uses widgetCssHooks to retrieve widget-properties indirectly", function() {
+        var spy = jasmine.createSpy().andReturn( "red" );
+        $.widgetCssHooks[ "foo" ] = { "get" : spy }
+
+        var result = $( widget ).css( "foo" );
+
+        expect( spy ).toHaveBeenCalledWith( same( widget ) );
+        expect( result ).toBe( "red" );
         delete $.widgetCssHooks.foo;
       } );
 
@@ -216,7 +239,7 @@ describe( "RWTQuery", function() {
         $( widget ).append( childElement );
 
         expect( childElement.parentElement ).toBe( element );
-        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( widget );
+        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( same( widget ) );
       } );
 
       it( "isChainable", function() {
@@ -247,13 +270,13 @@ describe( "RWTQuery", function() {
         expect( $( widget ).get().length ).toBe( 1 );
         expect( $( widget ).get()[0] ).toBe( widget.getElement() );
         expect( widget.getElement() ).toBeTruthy();
-        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( widget );
+        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( same( widget ) );
       } );
 
       it( "returns newly created element", function() {
         expect( $( widget ).get( 0 ) ).toBe( widget.getElement() );
         expect( widget.getElement() ).toBeTruthy();
-        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( widget );
+        expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( same( widget ) );
       } );
 
       it( "returns undefined for out of bounds index", function() {
@@ -403,7 +426,7 @@ describe( "RWTQuery", function() {
         spyOn( Style, "get" ).andReturn( "bar" );
 
         expect( $( element ).css( "foo" ) ).toBe( "bar" );
-        expect( Style.get ).toHaveBeenCalledWith( element, "foo" );
+        expect( Style.get ).toHaveBeenCalledWith( same( element ), "foo" );
       } );
 
       it( "sets single property", function() {
@@ -448,7 +471,18 @@ describe( "RWTQuery", function() {
 
         $( element ).css( "foo", "bar" );
 
-        expect( spy ).toHaveBeenCalledWith( element, "bar" );
+        expect( spy ).toHaveBeenCalledWith( same( element ), "bar" );
+        delete $.cssHooks.foo;
+      } );
+
+      it( "uses cssHooks getter", function() {
+        var spy = jasmine.createSpy();
+        $.cssHooks[ "foo" ] = { "get" : spy.andReturn( "bar" ) };
+
+        var result = $( element ).css( "foo" );
+
+        expect( spy ).toHaveBeenCalledWith( same( element ) );
+        expect( result ).toBe( "bar" );
         delete $.cssHooks.foo;
       } );
 
@@ -458,18 +492,24 @@ describe( "RWTQuery", function() {
 
       it( "delegate set backgroundColor", function() {
         spyOn( rwt.html.Style, "setBackgroundColor" );
-
         $( element ).css( "backgroundColor", "#ff00ee" );
 
-        expect( rwt.html.Style.setBackgroundColor ).toHaveBeenCalledWith( element, "#ff00ee" );
+        expect( rwt.html.Style.setBackgroundColor ).toHaveBeenCalledWith( same( element ), "#ff00ee" );
       } );
 
-      it( "delegate userSelect", function() {
-        spyOn( rwt.html.Style, "setUserSelect" );
+      it( "delegate get backgroundColor", function() {
+        spyOn( rwt.html.Style, "getBackgroundColor" ).andReturn( "green" );
 
+        var result = $( element ).css( "backgroundColor" );
+
+        expect( rwt.html.Style.getBackgroundColor ).toHaveBeenCalledWith( same( element ) );
+        expect( result ).toBe( "green" );
+      } );
+
+      it( "delegate set userSelect", function() {
         $( element ).css( "userSelect", "none" );
 
-        expect( rwt.html.Style.setUserSelect ).toHaveBeenCalledWith( element, "none" );
+        expect( $( element ).css( "userSelect" ) ).toBe( "none" );
       } );
 
       it( "delegate set backgroundGradient", function() {
@@ -478,7 +518,16 @@ describe( "RWTQuery", function() {
 
         $( element ).css( "backgroundGradient", gradient );
 
-        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( element, gradient );
+        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( same( element ), gradient );
+      } );
+
+      it( "delegate get backgroundGradient", function() {
+        spyOn( rwt.html.Style, "getBackgroundGradient" ).andReturn( "linear-gradient( to bottom, red 0%, green 50%, blue 100% )" );
+
+        var result = $( element ).css( "backgroundGradient" );
+
+        expect( rwt.html.Style.getBackgroundGradient ).toHaveBeenCalledWith( same( element ) );
+        expect( result ).toBe( "linear-gradient( to bottom, red 0%, green 50%, blue 100% )" );
       } );
 
       it( "still allow standard vertical backgroundGradient syntax", function() {
@@ -489,7 +538,7 @@ describe( "RWTQuery", function() {
 
         $( element ).css( "backgroundGradient", gradientStr );
 
-        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( element, gradient );
+        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( same( element ), gradient );
       } );
 
       it( "still allow standard horizontal backgroundGradient syntax", function() {
@@ -500,7 +549,7 @@ describe( "RWTQuery", function() {
 
         $( element ).css( "backgroundGradient", gradientStr );
 
-        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( element, gradient );
+        expect( rwt.html.Style.setBackgroundGradient ).toHaveBeenCalledWith( same( element ), gradient );
       } );
 
       it( "does not support any other standard backgroundGradient syntax", function() {
@@ -519,12 +568,13 @@ describe( "RWTQuery", function() {
         expect( testStr( "linear-gradien( to top, red 0%, green 50%, blue 100% )" ) ).toThrow();
       } );
 
-      it( "delegate set backgroundImage", function() {
-        spyOn( rwt.html.Style, "setBackgroundImage" );
+      it( "delegate get backgroundImage", function() {
+        spyOn( rwt.html.Style, "getBackgroundImage" ).andReturn( "url( foo.jpg )");
 
-        $( element ).css( "backgroundImage", "foo" );
+        var result = $( element ).css( "backgroundImage" );
 
-        expect( rwt.html.Style.setBackgroundImage ).toHaveBeenCalledWith( element, "foo" );
+        expect( rwt.html.Style.getBackgroundImage ).toHaveBeenCalledWith( same( element ) );
+        expect( result ).toBe( "url( foo.jpg )" );
       } );
 
       it( "still allow standard backgroundImage syntax", function() {
@@ -532,7 +582,7 @@ describe( "RWTQuery", function() {
 
         $( element ).css( "backgroundImage", "uRl( foo )" );
 
-        expect( rwt.html.Style.setBackgroundImage ).toHaveBeenCalledWith( element, "foo" );
+        expect( rwt.html.Style.setBackgroundImage ).toHaveBeenCalledWith( same( element ), "foo" );
       } );
 
       it( "sets border directly for strings", function() {

@@ -109,21 +109,33 @@ $.cssHooks = {
   "backgroundColor" : {
     "set" : function( element, value ) {
       rwt.html.Style.setBackgroundColor( element, value );
+    },
+    "get" : function( element ) {
+      return rwt.html.Style.getBackgroundColor( element );
     }
   },
   "userSelect" : {
     "set" : function( element, value ) {
       rwt.html.Style.setUserSelect( element, value );
+    },
+    "get" : function( element ) {
+      return rwt.html.Style.getUserSelect( element );
     }
   },
   "backgroundImage" : {
     "set" : function( element, value ) {
       rwt.html.Style.setBackgroundImage( element, fixBackgroundImage( value ) );
+    },
+    "get" : function( element ) {
+      return rwt.html.Style.getBackgroundImage( element );
     }
   },
   "backgroundGradient" : {
     "set" : function( element, value ) {
       rwt.html.Style.setBackgroundGradient( element, fixBackgroundGradient( value ) );
+    },
+    "get" : function( element ) {
+      return rwt.html.Style.getBackgroundGradient( element );
     }
   },
   "border" : {
@@ -148,24 +160,28 @@ $.cssHooks = {
 
 // NOTE: this list is still incomplete, extend as needed
 $.widgetCssHooks = {
-  "font" : "font",
-  "border" : "border",
-  "backgroundColor" : "backgroundColor",
-  "color" : "textColor",
-  "left" : "left",
-  "top" : "top",
-  "width" : "width",
-  "height" : "height",
-  "bottom" : "bottom",
-  "right" : "right",
-  "opacity" : "opacity",
-  "overflow" : "overflow",
-  "userSelect" : "selectable",
-  "backgroundImage" : function( widget, value ) {
-    widget.set( "backgroundImage", fixBackgroundImage( value ) );
+  "font": "font",
+  "border": "border",
+  "backgroundColor": "backgroundColor",
+  "color": "textColor",
+  "left": "left",
+  "top": "top",
+  "width": "width",
+  "height": "height",
+  "bottom": "bottom",
+  "right": "right",
+  "opacity": "opacity",
+  "overflow": "overflow",
+  "userSelect": "selectable",
+  "backgroundImage": {
+    "set" : function( widget, value ) {
+      widget.set( "backgroundImage", fixBackgroundImage( value ) );
+    }
   },
-  "backgroundGradient" : function( widget, value ) {
-    widget.set( "backgroundGradient", fixBackgroundGradient( value ) );
+  "backgroundGradient" : {
+    "set" : function( widget, value ) {
+      widget.set( "backgroundGradient", fixBackgroundGradient( value ) );
+    }
   }
 };
 
@@ -184,11 +200,11 @@ var unwrapSetterArgsFor = function( originalSetter ) {
     if( args.length === 1 && ( typeof args[ 0 ] === "object" ) ) {
       var map = args[ 0 ];
       for( var key in map ) {
-        originalSetter.apply( this, [ target, [ key, map[ key ], privileged ] ] );
+        originalSetter.apply( this, [ target, [ key, map[ key ] ], privileged ] );
       }
       return this;
     }
-    return originalSetter.apply( this, [ arguments[ 0 ], arguments[ 1 ], privileged ] );
+    return originalSetter.apply( this, [ target, args, privileged ] );
   };
 };
 
@@ -250,15 +266,23 @@ var removeProp_element = unwrapSetterArgsFor( function( element, args ) {
 } );
 
 var css_widget = unwrapSetterArgsFor( function( widget, args ) {
+  var hook = $.widgetCssHooks[ args[ 0 ] ];
   if( args.length === 1 ) {
+    if( hook && ( typeof hook === "string" || hook.get ) ) {
+      if( typeof hook === "string" ) {
+        var getter = "get" + hook.slice( 0, 1 ).toUpperCase() +  hook.slice( 1 );
+        return widget[ getter ]();
+      } else {
+        return hook.get( widget );
+      }
+    }
     return widget.getStyleProperties()[ args[ 0 ] ];
   }
-  var hook = $.widgetCssHooks[ args[ 0 ] ];
-  if( hook ) {
-    if( typeof hook === "function" ) {
-      hook( widget, args[ 1 ] );
-    } else {
+  if( hook && ( typeof hook === "string" || hook.set ) ) {
+    if( typeof hook === "string"  ) {
       widget.set( hook, args[ 1 ] );
+    } else {
+      hook.set( widget, args[ 1 ] );
     }
   } else {
     widget.setStyleProperty( args[ 0 ], args[ 1 ] );
@@ -267,14 +291,18 @@ var css_widget = unwrapSetterArgsFor( function( widget, args ) {
 } );
 
 var css_element = unwrapSetterArgsFor( function( element, args ) {
-  var hooks = $.cssHooks[ args[ 0 ] ];
+  var hook = $.cssHooks[ args[ 0 ] ];
   if( args.length === 1 ) {
+    if( hook && hook.get ) {
+      return hook.get( element );
+    }
     return Style.get( element, args[ 0 ] );
   }
-  if( hooks && hooks.set ) {
-    hooks.set( element, args[ 1 ] );
+  if( hook && hook.set ) {
+    hook.set( element, args[ 1 ] );
+  } else {
+    element.style[ args[ 0 ] ] = parseCssValue( args );
   }
-  element.style[ args[ 0 ] ] = parseCssValue( args );
   return this;
 } );
 

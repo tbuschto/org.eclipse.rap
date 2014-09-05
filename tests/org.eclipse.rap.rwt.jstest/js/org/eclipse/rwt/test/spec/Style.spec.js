@@ -70,6 +70,20 @@ describe( "Style", function() {
         expect( TestUtil.getCssGradient( element ) ).toBe( hGradientString );
       } );
 
+      it( "vertical gradient is returned by getBackgroundGradient in standard syntax", function() {
+        Style.setBackgroundGradient( element, vGradientObject );
+
+        var expected = "linear-gradient( to bottom, rgb(255, 0, 255) 0%, rgb(0, 255, 0) 100% )";
+        expect( Style.getBackgroundGradient( element ) ).toBe( expected );
+      } );
+
+      it( "horizontal gradient is returned by getBackgroundGradient in standard syntax", function() {
+        Style.setBackgroundGradient( element, hGradientObject );
+
+        var expected = "linear-gradient( to right, rgb(255, 0, 255) 0%, rgb(0, 255, 0) 100% )";
+        expect( Style.getBackgroundGradient( element ) ).toBe( expected );
+      } );
+
       it( "clears background property", function() {
         Style.setBackgroundGradient( element, vGradientObject );
 
@@ -120,6 +134,12 @@ describe( "Style", function() {
       Style.setBackgroundImage( element, image );
 
       expect( TestUtil.getCssBackgroundImage( element ) ).toContain( image );
+    } );
+
+    it( "value is returned by getBackgroundImage", function() {
+      Style.setBackgroundImage( element, image );
+
+      expect( Style.getBackgroundImage( element ) ).toBe( "url(" + image + ")" );
     } );
 
     it( "sets background property together with background color", function() {
@@ -220,6 +240,12 @@ describe( "Style", function() {
       expect( cssColor ).toEqual( [ 255, 0, 0 ] );
     } );
 
+    it( "value is returned by getBackgroundColor", function() {
+      Style.setBackgroundColor( element, color );
+
+      expect( Style.getBackgroundColor( element ) ).toBe( color );
+    } );
+
     it( "sets background property together with background image", function() {
       Style.setBackgroundImage( element, image );
 
@@ -313,18 +339,23 @@ describe( "Style", function() {
       } );
     }
 
-    describe( "setUserSelect", function() {
+  } );
 
-      it( "sets user select with vendor prefix", function() {
-        Style.setUserSelect( element, "none" );
+  describe( "userSelect", function() {
 
-        var userSelect =    element.style[ Style.VENDOR_PREFIX_PROPERTY + "UserSelect" ]
-                         || element.style.userSelect;
-        expect( userSelect ).toBe( "none" );
-      } );
+    it( "is set with vendor prefix", function() {
+      Style.setUserSelect( element, "none" );
 
+      var userSelect =    element.style[ Style.VENDOR_PREFIX_PROPERTY + "UserSelect" ]
+                       || element.style.userSelect;
+      expect( userSelect ).toBe( "none" );
     } );
 
+    it( "is get without vendor prefix", function() {
+      Style.setUserSelect( element, "none" );
+
+      expect( Style.getUserSelect( element ) ).toBe( "none" );
+    } );
 
   } );
 
