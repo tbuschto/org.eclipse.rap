@@ -79,6 +79,7 @@ $.prototype = {
     return this.__access( arguments, null, removeProp_element );
   },
 
+  // TODO: make work against widget targetNode, not getElement (also text),
   append : function() {
     return this.__access( arguments, null, append_element );
   },

@@ -149,6 +149,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       this._appearance = appearance;
     },
 
+    getAppearance : function( appearance ) {
+      return this._appearance;
+    },
+
     setWidth : function( width ) {
       this.$el.css( "width", width );
     },

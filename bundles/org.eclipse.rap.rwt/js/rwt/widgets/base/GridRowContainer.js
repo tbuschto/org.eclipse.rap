@@ -122,26 +122,26 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     setRowWidth : function( width ) {
       this._rowWidth = width;
-      for( var i = 0; i < this._children.length; i++ ) {
-        this.row( i ).setWidth( width );
+      for( var i = 0; i < this.getRowCount(); i++ ) {
+        this.getRow( i ).setWidth( width );
       }
     },
 
     setRowHeight : function( height ) {
       this._rowHeight = height;
-      for( var i = 0; i < this._children.length; i++ ) {
-        this.row( i ).setHeight( height );
+      for( var i = 0; i < this.getRowCount(); i++ ) {
+        this.getRow( i ).setHeight( height );
       }
       this._updateRowCount();
     },
 
     setCellToolTipsEnabled : function( value ) {
       this._cellToolTipsEnabled = value;
-      for( var i = 0; i < this._children.length; i++ ) {
+      for( var i = 0; i < this.getRowCount(); i++ ) {
         if( value ) {
-          this.row( i ).setToolTipText( "" );
+          this.getRow( i ).setToolTipText( "" );
         } else {
-          this.row( i ).resetToolTipText();
+          this.getRow( i ).resetToolTipText();
         }
       }
     },
@@ -153,17 +153,17 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     updateRowLines : function() {
       var border = this._config.linesVisible ? this._getHorizontalGridBorder() : null;
       this._rowBorder = border;
-      for( var i = 0; i < this._children.length; i++ ) {
-        this.row( i ).setBorder( border );
-        this.row( i ).setState( "linesvisible", this._config.linesVisible );
+      for( var i = 0; i < this.getRowCount(); i++ ) {
+        this.getRow( i ).$el.css( "border", border );
+        this.getRow( i ).setState( "linesvisible", this._config.linesVisible );
       }
     },
 
-    rowCount : function() {
+    getRowCount : function() {
       return this.$el.prop( "childElementCount" );
     },
 
-    row : function( index ) {
+    getRow : function( index ) {
       return this.$el.prop( "children" )[ index ][ "row" ];
     },
 
@@ -260,10 +260,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         this._topItemIndex = index;
         var forwards = delta > 0;
         delta = Math.abs( delta );
-        if( delta >= this.rowCount() ) {
+        if( delta >= this.getRowCount() ) {
           this._renderAll( true );
         } else {
-          var numberOfShiftingRows = this.rowCount() - delta;
+          var numberOfShiftingRows = this.getRowCount() - delta;
           var updateFromRow = forwards ? numberOfShiftingRows : 0;
           var newFirstRow = forwards ? delta : numberOfShiftingRows;
           this._switchRows( newFirstRow );
@@ -284,7 +284,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         var item = queue[ key ];
         var index = this._items.indexOf( item );
         if( index !== -1 ) {
-          this._renderRow( this.row( index ), item );
+          this._renderRow( this.getRow( index ), item );
         }
       }
     },
@@ -306,7 +306,13 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     findItemByRow : function( targetRow ) {
-      var index = this._children.indexOf( targetRow );
+      var index = -1;
+      var rowCount = this.getRowCount();
+      for( var i = 0; i < rowCount && index === -1; i++ ) {
+        if( this.getRow( i ) === targetRow ) {
+          index = i;
+        }
+      }
       return index !== -1 ? this._items[ index ] : null;
     },
 
@@ -330,7 +336,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         this._renderGridVertical();
       }
       var start = ( new Date() ).getTime();
-      this._updateRows( 0, this.rowCount(), contentOnly );
+      this._updateRows( 0, this.getRowCount(), contentOnly );
       this._renderBounds();
       if( this._postRender ) { // TODO : remove with IE8 support
         var postRender = this._postRender;
@@ -345,7 +351,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _updateRowCount : function() {
       var rowsNeeded = Math.round( ( this.getHeight() / this._rowHeight ) + 0.5 );
-      while( this.rowCount() < rowsNeeded ) {
+      while( this.getRowCount() < rowsNeeded ) {
         var row = new rwt.widgets.base.GridRow( this.getParent() );
         row.setAppearance( this._getRowAppearance() );
         if( this._cellToolTipsEnabled ) {
@@ -360,39 +366,43 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         row.setState( "linesvisible", this._config.linesVisible );
         this.$el.append( row.$el );
       }
-      while( this.rowCount() > rowsNeeded ) {
-        this._children[ this.rowCount() - 1 ].destroy();
+      while( this.getRowCount() > rowsNeeded ) {
+        this.getRow( this.getRowCount() - 1 ).dispose();
       }
-      this._items.length = this.rowCount();
+      this._items.length = this.getRowCount();
       this._updateRowsEvenState();
     },
 
     _updateRowsEvenState: function() {
-      for( var i = 0; i < this.rowCount(); i++ ) {
-        this.row( i ).updateEvenState( this._topItemIndex + i );
+      var rowCount = this.getRowCount();
+      for( var i = 0; i < rowCount; i++ ) {
+        if( !this.getRow( i ) ) {
+          debugger;
+        }
+        this.getRow( i ).updateEvenState( this._topItemIndex + i );
       }
     },
 
     _findRowByItem : function( targetItem ) {
       var index = this._items.indexOf( targetItem );
-      return index !== -1 ? this.row( index ) : null;
+      return index !== -1 ? this.getRow( index ) : null;
     },
 
     _updateRows : function( from, delta, contentOnly ) {
       this._updateRowsEvenState();
       var item = this._topItem;
       var to = from + delta;
-      var row = 0;
-      while( item != null && row < this.rowCount() ) {
-        if( row >= from && row <= to ) {
-          this._renderRow( this._children[ row ], item, contentOnly );
-          this._items[ row ] = item;
+      var rowIndex = 0;
+      while( item != null && rowIndex < this.getRowCount() ) {
+        if( rowIndex >= from && rowIndex <= to ) {
+          this._renderRow( this.getRow( rowIndex ), item, contentOnly );
+          this._items[ rowIndex ] = item;
         }
         item = item.getNextItem();
-        row++;
+        rowIndex++;
       }
-      for( var i = row; i < this.rowCount(); i++ ) {
-        this._renderRow( this.row( i ), null, contentOnly );
+      for( var i = rowIndex; i < this.getRowCount(); i++ ) {
+        this._renderRow( this.getRow( i ), null, contentOnly );
         this._items[ i ] = null;
       }
     },
@@ -415,8 +425,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _renderBounds : function( renderLocation ) {
       if( renderLocation ) {
-        for( var i = 0; i < this.rowCount(); i++ ) {
-          this.row( i ).addToLayoutChanges( "locationY" );
+        for( var i = 0; i < this.getRowCount(); i++ ) {
+          this.getRow( i ).addToLayoutChanges( "locationY" );
         }
       }
       //this.getLayoutImpl().layoutChild( this.row( i ), changes );

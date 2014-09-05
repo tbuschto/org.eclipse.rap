@@ -630,12 +630,17 @@ org.eclipse.rwt.test.fixture.TestUtil = {
     }
   } ),
 
-  fakeMouseEvent : function( widget, type, left, top ) {
-    if( !widget._isCreated ) {
-      throw( "Error in TestUtil.fakeMouseEvent: widget is not created" );
-    }
+  fakeMouseEvent : function( target, type, left, top ) {
     var button = rwt.event.MouseEvent.buttons.left;
-    var target = widget._getTargetNode();
+    if( target instanceof rwt.widgets.base.Widget ) {
+      if( !target._isCreated ) {
+        throw( "Error in TestUtil.fakeMouseEvent: widget is not created" );
+      }
+      target = target._getTargetNode();
+    }
+    if( target instanceof rwt.util.RWTQuery ) {
+      target = target.get( 0 );
+    }
     this.fakeMouseEventDOM( target, type, button, left, top, 0 );
   },
 

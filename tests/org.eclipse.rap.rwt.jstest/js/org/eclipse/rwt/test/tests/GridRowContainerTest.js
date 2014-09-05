@@ -37,8 +37,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       cont.setBaseAppearance( "table" );
       cont.setRowHeight( 50 );
       cont.setHeight( 501 );
-      assertEquals( 11, cont.getChildren().length );
-      assertEquals( "table-row", cont.getChildren()[ 0 ].getAppearance() );
+      assertEquals( 11, getRows( cont ).length );
+      assertEquals( "table-row", getRows( cont )[ 0 ].getAppearance() );
     },
 
     testAddTreeRowsOnTreeResize : function() {
@@ -47,7 +47,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setHeight( 501 );
       tree.setHeight( 551 );
       var clientArea = tree._rowContainer;
-      assertEquals( 12, clientArea.getChildren().length );
+      assertEquals( 12, getRows( clientArea ).length );
       tree.destroy();
     },
 
@@ -56,11 +56,11 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setItemHeight( 50 );
       var clientArea = tree._rowContainer;
       tree.setHeight( 499 );
-      assertEquals( 10, clientArea.getChildren().length );
+      assertEquals( 10, getRows( clientArea ).length );
       tree.setHeight( 500 );
-      assertEquals( 11, clientArea.getChildren().length );
+      assertEquals( 11, getRows( clientArea ).length );
       tree.setHeight( 501 );
-      assertEquals( 11, clientArea.getChildren().length );
+      assertEquals( 11, getRows( clientArea ).length );
       tree.destroy();
     },
 
@@ -70,7 +70,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setHeight( 501 );
       tree.setItemHeight( 25 );
       var clientArea = tree._rowContainer;
-      assertEquals( 21, clientArea.getChildren().length );
+      assertEquals( 21, getRows( clientArea ).length );
       tree.destroy();
     },
 
@@ -80,7 +80,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setHeight( 501 );
       tree.setHeight( 401 );
       var clientArea = tree._rowContainer;
-      assertEquals( 9, clientArea.getChildren().length );
+      assertEquals( 9, getRows( clientArea ).length );
       tree.destroy();
     },
 
@@ -90,14 +90,14 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setHeight( 501 );
       tree.setItemHeight( 100 );
       var clientArea = tree._rowContainer;
-      assertEquals( 6, clientArea.getChildren().length );
+      assertEquals( 6, getRows( clientArea ).length );
       tree.destroy();
     },
 
     testTreeRowBounds : function() {
       var tree = this._createDefaultTree();
-      var sample = tree._rowContainer._getTargetNode().childNodes[ 10 ];
-      var bounds = TestUtil.getElementBounds( sample );
+      var sample = tree._rowContainer.$el.prop( "childNodes" )[ 10 ];
+      var bounds = getElementBounds( sample );
       assertEquals( 0, bounds.left );
       assertEquals( 200, bounds.top );
       assertEquals( 500, bounds.width );
@@ -119,12 +119,12 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       }
       root.setExpanded( true );
       TestUtil.flush();
-      var node = tree._rowContainer._children[ 2 ]._getTargetNode();
+      var node = tree._rowContainer.getRow( 2 ).$el.get( 0 );
       assertEquals( "item1", node.firstChild.innerHTML );
       root.setExpanded( false );
       TestUtil.flush();
       assertEquals( "", node.firstChild.innerHTML );
-      TestUtil.mouseOver( tree._rowContainer._children[ 2 ] );
+      TestUtil.mouseOver( tree._rowContainer.getRow( 2 ).$el );
 
       assertEquals( "", node.firstChild.innerHTML );
       tree.destroy();
@@ -163,25 +163,25 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       root.setExpanded( true );
       tree.selectItem( item );
       TestUtil.flush();
-      var row = tree._rowContainer._children[ 1 ];
-      assertEquals( "red", row.getBackgroundColor() );
-      assertEquals( "foo.jpg", row.getBackgroundImage() );
-      assertIdentical( grad1, row.getBackgroundGradient() );
+      var row = tree._rowContainer.getRow( 1 );
+      assertEquals( "red", row.$el.css( "backgroundColor" ) );
+      assertEquals( "url(foo.jpg)", row.$el.css( "backgroundImage" ) );
+      assertIdentical( "linear-gradient( to bottom, red 0%, yellow 100% )", row.$el.css( "backgroundGradient" ) );
       root.setExpanded( false );
       TestUtil.flush();
-      assertNull( row.getBackgroundColor() );
-      assertNull( row.getBackgroundImage() );
-      assertNull( row.getBackgroundGradient() );
+      assertEquals( "transparent", row.$el.css( "backgroundColor" ) );
+      assertEquals( "none", row.$el.css( "backgroundImage" ) );
+      assertIdentical( undefined, row.$el.css( "backgroundGradient" ) );
       tree.destroy();
     },
 
     testChangeTreeRowBounds : function() {
       var tree = this._createDefaultTree();
-      var sample = tree._rowContainer._getTargetNode().childNodes[ 10 ];
+      var sample = tree._rowContainer.$el.prop( "childNodes" )[ 10 ];
       tree.setWidth( 400 );
       tree.setItemHeight( 15 );
       TestUtil.flush();
-      var bounds = TestUtil.getElementBounds( sample );
+      var bounds = getElementBounds( sample );
       assertEquals( 0, bounds.left );
       assertEquals( 150, bounds.top );
       assertEquals( 500, bounds.width );
@@ -193,7 +193,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       var tree = this._createDefaultTree( true );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var row = tree._rowContainer._children[ 0 ];
+      var row = tree._rowContainer.getRow( 0 );
       assertTrue( row.hasState( "linesvisible" ) );
       tree.setLinesVisible( false );
       assertFalse( row.hasState( "linesvisible" ) );
@@ -204,7 +204,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       var tree = this._createDefaultTree( true );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var row = tree._rowContainer._children[ 0 ];
+      var row = tree._rowContainer.getRow( 0 );
       assertEquals( 0, row.getZIndex() );
       assertEquals( 1, parseInt( tree._rowContainer._vertGridLines[ 0 ].style.zIndex, 10 ) );
       tree.destroy();
@@ -214,17 +214,17 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       var tree = this._createDefaultTree( true );
       TestUtil.flush();
       tree.setLinesVisible( true );
-      var row = tree._rowContainer._children[ 24 ];
+      var row = tree._rowContainer.getRow( 24 );
       assertTrue( row.hasState( "linesvisible" ) );
       tree.setHeight( 1000 );
-      row = tree._rowContainer._children[ 28 ];
+      row = tree._rowContainer.getRow( 28 );
       assertTrue( row.hasState( "linesvisible" ) );
       tree.destroy();
     },
 
     testGridLinesHorizontal : function() {
       var tree = this._createDefaultTree();
-      var row = tree._rowContainer._children[ 0 ];
+      var row = tree._rowContainer.getRow( 0 );
       assertFalse( TestUtil.hasCssBorder( row.getElement() ) );
       tree.setLinesVisible( true );
       TestUtil.flush();
@@ -240,7 +240,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setHeight( 100 );
       TestUtil.flush();
       var border = tree._rowContainer._getHorizontalGridBorder();
-      var row = tree._rowContainer._children[ 0 ];
+      var row = tree._rowContainer.getRow( 0 );
       assertIdentical( border, row.getBorder() );
       tree.destroy();
     },
@@ -278,7 +278,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
       cont.setCellToolTipsEnabled( true );
 
-      assertEquals( "", cont.getChildren()[ 0 ].getToolTipText() );
+      assertEquals( "", getRows( cont )[ 0 ].getToolTipText() );
     },
 
     testSetCellToolTipsEnabled_TrueAfterHeightChange : function() {
@@ -298,7 +298,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       cont.setCellToolTipsEnabled( true );
       cont.setCellToolTipsEnabled( false );
 
-      assertNull( cont.getChildren()[ 0 ].getToolTipText() );
+      assertNull( getRows( cont )[ 0 ].getToolTipText() );
     },
 
     /////////
@@ -333,7 +333,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
     _fakeAppearance : function() {
       var empty = {
-        style : function( states ) {
+        style : function() {
           return {
             "background" : "undefined",
             "backgroundGradient" : null,
@@ -356,6 +356,24 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
   }
 
 } );
+
+  var getRows = function( container ) {
+    var count = container.getRowCount();
+    var result = [];
+    for( var i = 0; i < count; i++ ) {
+      result[ i ] = container.getRow( i );
+    }
+    return result;
+  };
+
+  getElementBounds = function( node ) {
+    return {
+      left : node.offsetLeft,
+      top : node.offsetTop,
+      width : node.offsetWidth,
+      height : node.offsetHeight
+    };
+  };
 
 }() );
 
