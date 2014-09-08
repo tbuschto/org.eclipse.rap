@@ -21,6 +21,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     this.$outer = $( $( this ).get( 0 ) ); // also forces widget creation, enables next line:
     this.$inner = new rwt.util._RWTQuery( this._getTargetNode() );
     this.setOverflow( "hidden" );
+    this.$outer.css( "overflow", "hidden" );
     this._scrollLeft = 0;
     this._rowHeight = 16;
     this._rowWidth = 0;
@@ -45,6 +46,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
   },
 
   destruct : function() {
+    while( this.getRowCount() > 0 ) {
+      this.getRow( 0 ).dispose();
+    }
     this._rowBorder = null;
     this._topItem = null;
     this._renderTime = null;
@@ -106,13 +110,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     /**
-     * Calls this function after each complete rendering with the renderTime in ms.
-     */
-    setPostRenderFunction : function( func, context ) {
-      this._postRender = [ func, context ];
-    },
-
-    /**
      * Calls this function with an item as the parameter. Expects a boolean as return value.
      */
     setSelectionProvider : function( func, context ) {
@@ -127,16 +124,16 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     setRowWidth : function( width ) {
       this._rowWidth = width;
-      for( var i = 0; i < this.getRowCount(); i++ ) {
-        this.getRow( i ).setWidth( width );
-      }
+      this._forEachRow(function(row){
+        row.setWidth( width );
+      });
     },
 
     setRowHeight : function( height ) {
       this._rowHeight = height;
-      for( var i = 0; i < this.getRowCount(); i++ ) {
-        this.getRow( i ).setHeight( height );
-      }
+      this._forEachRow( function( row ) {
+        row.setHeight( height );
+      });
       this._updateRowCount();
     },
 
@@ -158,10 +155,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     updateRowLines : function() {
       var border = this._config.linesVisible ? this._getHorizontalGridBorder() : null;
       this._rowBorder = border;
-      for( var i = 0; i < this.getRowCount(); i++ ) {
-        this.getRow( i ).$el.css( "border", border );
-        this.getRow( i ).setState( "linesvisible", this._config.linesVisible );
-      }
+      this._forEachRow( function( row ) {
+        row.$el.css( "border", border );
+        row.setState( "linesvisible", this._config.linesVisible );
+      } );
     },
 
     getRowCount : function() {
@@ -335,18 +332,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       if( !contentOnly ) {
         this._renderGridVertical();
       }
-      var start = ( new Date() ).getTime();
       this._updateRows( 0, this.getRowCount(), contentOnly );
       this._renderBounds();
-      if( this._postRender ) { // TODO : remove with IE8 support
-        var postRender = this._postRender;
-        window.setTimeout( function() {
-          var renderTime = ( new Date() ).getTime() - start;
-          if( !postRender[ 1 ].isDisposed() ) {
-            postRender[ 0 ].call( postRender[ 1 ], renderTime );
-          }
-        }, 0 );
-      }
     },
 
     _updateRowCount : function() {
@@ -374,13 +361,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     _updateRowsEvenState: function() {
-      var rowCount = this.getRowCount();
-      for( var i = 0; i < rowCount; i++ ) {
-        if( !this.getRow( i ) ) {
-          debugger;
-        }
-        this.getRow( i ).updateEvenState( this._topItemIndex + i );
-      }
+      this._forEachRow( function( row, i ) {
+        row.updateEvenState( this._topItemIndex + i );
+      } );
     },
 
     _findRowByItem : function( targetItem ) {
@@ -425,12 +408,12 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _renderBounds : function( renderLocation ) {
       if( renderLocation ) {
-        for( var i = 0; i < this.getRowCount(); i++ ) {
-          this.getRow( i ).addToLayoutChanges( "locationY" );
-        }
+//        for( var i = 0; i < this.getRowCount(); i++ ) {
+//          this.getRow( i ).addToLayoutChanges( "locationY" );
+//        }
       }
       //this.getLayoutImpl().layoutChild( this.row( i ), changes );
-      this._flushChildrenQueue();
+//      this._flushChildrenQueue();
     },
 
     _onElementOver : function( event ) {
@@ -495,6 +478,13 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _isSelected : function( item ) {
       return this._selectionProvider[ 0 ].call( this._selectionProvider[ 1 ], item );
+    },
+
+    _forEachRow : function( fn ) {
+      var rowCount = this.getRowCount();
+      for( var i = 0; i < rowCount; i++ ) {
+        fn.call( this, this.getRow( i ), i );
+      }
     },
 
     //////////////

@@ -551,11 +551,11 @@ org.eclipse.rwt.test.fixture.TestUtil = {
   // Event handling - Qooxdoo
 
   click : function( widget, left, top ) {
-    this.clickDOM( widget._getTargetNode(), left, top );
+    this.clickDOM( this._toElement( widget ), left, top );
   },
 
   doubleClick : function( widget ) {
-    var node = widget._getTargetNode();
+    var node = this._toElement( widget );
     this.clickDOM( node );
     this.clickDOM( node );
     var left = rwt.event.MouseEvent.buttons.left;
@@ -563,18 +563,18 @@ org.eclipse.rwt.test.fixture.TestUtil = {
   },
 
   shiftClick : function( widget ) {
-    var node = widget._getTargetNode();
+    var node = this._toElement( widget );
     this.shiftClickDOM( node );
   },
 
   ctrlClick : function( widget ) {
-    var node = widget._getTargetNode();
+    var node = this._toElement( widget );
     this.ctrlClickDOM( node );
   },
 
   rightClick : function( widget ) {
     var right = rwt.event.MouseEvent.buttons.right;
-    var node = widget._getTargetNode();
+    var node = this._toElement( widget );
     // TODO [tb] : Event order differs on MAC OS
     this.fakeMouseEventDOM( node, "mousedown", right );
     this.fakeMouseEventDOM( node, "mouseup", right );
@@ -632,20 +632,12 @@ org.eclipse.rwt.test.fixture.TestUtil = {
 
   fakeMouseEvent : function( target, type, left, top ) {
     var button = rwt.event.MouseEvent.buttons.left;
-    if( target instanceof rwt.widgets.base.Widget ) {
-      if( !target._isCreated ) {
-        throw( "Error in TestUtil.fakeMouseEvent: widget is not created" );
-      }
-      target = target._getTargetNode();
-    }
-    if( target instanceof rwt.util.RWTQuery ) {
-      target = target.get( 0 );
-    }
-    this.fakeMouseEventDOM( target, type, button, left, top, 0 );
+    var node = this._toElement( target );
+    this.fakeMouseEventDOM( node, type, button, left, top, 0 );
   },
 
   press : function( widget, key, checkActive, mod ) {
-    var target = widget._getTargetNode();
+    var target = this._toElement( widget );
     if( checkActive !== true && !this.isActive( widget ) ) {
       widget.focus();
     }
@@ -704,6 +696,21 @@ org.eclipse.rwt.test.fixture.TestUtil = {
     keyHandler._lastUpDownType = {};
     rwt.event.EventHandler.setCaptureWidget( null );
     rwt.event.EventHandler.setBlockKeyEvents( false );
+  },
+
+  _toElement : function( target ) {
+    if( target instanceof rwt.widgets.base.Widget ) {
+      return target._getTargetNode();
+    }
+    if( target instanceof rwt.util.RWTQuery ) {
+      return target.get( 0 );
+    }
+    if( target.$el ) {
+      return target.$el.get( 0 );
+    }
+    if( target.$inner ) {
+      return target.$inner.get( 0 );
+    }
   },
 
   ////////////////

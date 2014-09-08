@@ -366,7 +366,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
     return result;
   };
 
-  getElementBounds = function( node ) {
+  var getElementBounds = function( node ) {
     return {
       left : node.offsetLeft,
       top : node.offsetTop,

@@ -34,7 +34,7 @@ rwt.util._RWTQuery = function( target ) {
 
 var $ = rwt.util.RWTQuery;
 
-$.prototype = {
+rwt.util._RWTQuery.prototype = $.prototype = {
 
   init : function( target, privileged ) {
     if( typeof target === "string" ) {

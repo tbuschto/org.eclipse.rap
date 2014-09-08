@@ -501,9 +501,12 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
     _onMouseDown : function( event ) {
       this._delayedSelection = false;
       if( !this._checkAndProcessHyperlink( event ) ) {
-        var target = event.getOriginalTarget();
-        if( target instanceof rwt.widgets.base.GridRow ) {
-          this._onRowMouseDown( target, event );
+        var target = event.getDomTarget();
+        while( target && !target.row && !target.rwtWidget ) {
+          target = target.parentElement;
+        }
+        if( target.row ) {
+          this._onRowMouseDown( target.row, event );
         }
       }
     },
@@ -523,7 +526,7 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
     _onRowMouseDown : function( row, event ) {
       var item = this._rowContainer.findItemByRow( row );
       if( item != null ) {
-        var identifier = row.getTargetIdentifier( event );
+        var identifier = row.identify( event.getDomTarget() );
         if( identifier[ 0 ] === "expandIcon" && item.hasChildren() ) {
           this._onExpandClick( item );
         } else if( identifier[ 0 ] === "checkBox" || identifier[ 0 ] === "cellCheckBox" ) {
