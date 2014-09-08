@@ -9,12 +9,17 @@
  *    EclipseSource - initial API and implementation
  ******************************************************************************/
 
+(function( $ ){
+
 rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
   extend : rwt.widgets.base.VerticalBoxLayout,
 
   construct : function() {
     this.base( arguments );
-    this.$el = new rwt.util._RWTQuery( this );
+    // Don't use $ to wrap widget, we need to be able to address inner and outer element separately
+    this.enableEnhancedBorder();
+    this.$outer = $( $( this ).get( 0 ) ); // also forces widget creation, enables next line:
+    this.$inner = new rwt.util._RWTQuery( this._getTargetNode() );
     this.setOverflow( "hidden" );
     this._scrollLeft = 0;
     this._rowHeight = 16;
@@ -136,14 +141,14 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     setCellToolTipsEnabled : function( value ) {
-      this._cellToolTipsEnabled = value;
-      for( var i = 0; i < this.getRowCount(); i++ ) {
-        if( value ) {
-          this.getRow( i ).setToolTipText( "" );
-        } else {
-          this.getRow( i ).resetToolTipText();
-        }
-      }
+//      this._cellToolTipsEnabled = value;
+//      for( var i = 0; i < this.getRowCount(); i++ ) {
+//        if( value ) {
+//          this.getRow( i ).setToolTipText( "" );
+//        } else {
+//          this.getRow( i ).resetToolTipText();
+//        }
+//      }
     },
 
     getCellToolTipsEnabled : function() {
@@ -160,11 +165,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     getRowCount : function() {
-      return this.$el.prop( "childElementCount" );
+      return this.$inner.prop( "childElementCount" );
     },
 
     getRow : function( index ) {
-      return this.$el.prop( "children" )[ index ][ "row" ];
+      return this.$inner.prop( "children" )[ index ][ "row" ];
     },
 
     _renderGridVertical : function() {
@@ -197,13 +202,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         line.style.top = "0px";
         line.style.width = "0px";
         this._getVerticalGridBorder().renderElement( line );
-        if( this._isCreated ) {
-          this._getTargetNode().appendChild( line );
-        } else {
-          this.addEventListener( "appear", function() {
-            this._getTargetNode().appendChild( line );
-          }, this );
-        }
+        // Important: add to outer element to keep the row-to-children mapping intact
+        this.$outer.append( line );
         this._vertGridLines[ column ] = line;
       }
       return this._vertGridLines[ column ];
@@ -364,7 +364,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
           "border": this._rowBorder
         } );
         row.setState( "linesvisible", this._config.linesVisible );
-        this.$el.append( row.$el );
+        this.$inner.append( row.$el );
       }
       while( this.getRowCount() > rowsNeeded ) {
         this.getRow( this.getRowCount() - 1 ).dispose();
@@ -512,3 +512,5 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
   }
 } );
+
+}( rwt.util._RWTQuery ));

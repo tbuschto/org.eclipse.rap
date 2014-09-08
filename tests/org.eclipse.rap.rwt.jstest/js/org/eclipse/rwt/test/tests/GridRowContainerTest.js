@@ -96,7 +96,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
     testTreeRowBounds : function() {
       var tree = this._createDefaultTree();
-      var sample = tree._rowContainer.$el.prop( "childNodes" )[ 10 ];
+      var sample = tree._rowContainer.$inner.prop( "childNodes" )[ 10 ];
       var bounds = getElementBounds( sample );
       assertEquals( 0, bounds.left );
       assertEquals( 200, bounds.top );
@@ -177,7 +177,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
     testChangeTreeRowBounds : function() {
       var tree = this._createDefaultTree();
-      var sample = tree._rowContainer.$el.prop( "childNodes" )[ 10 ];
+      var sample = tree._rowContainer.$inner.prop( "childNodes" )[ 10 ];
       tree.setWidth( 400 );
       tree.setItemHeight( 15 );
       TestUtil.flush();
@@ -204,8 +204,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       var tree = this._createDefaultTree( true );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var row = tree._rowContainer.getRow( 0 );
-      assertEquals( 0, row.getZIndex() );
       assertEquals( 1, parseInt( tree._rowContainer._vertGridLines[ 0 ].style.zIndex, 10 ) );
       tree.destroy();
     },
@@ -225,11 +223,12 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
     testGridLinesHorizontal : function() {
       var tree = this._createDefaultTree();
       var row = tree._rowContainer.getRow( 0 );
-      assertFalse( TestUtil.hasCssBorder( row.getElement() ) );
+      assertFalse( TestUtil.hasCssBorder( row.$el.get( 0 ) ) );
       tree.setLinesVisible( true );
       TestUtil.flush();
       var border = tree._rowContainer._getHorizontalGridBorder();
-      assertIdentical( border, row.getBorder() );
+      assertEquals( border.getWidthBottom(), parseInt( row.$el.css( "borderBottomWidth" ), 10 ) );
+      assertEquals( border.getWidthTop(), parseInt( row.$el.css( "borderTopWidth" ), 10 ) );
       tree.destroy();
     },
 
@@ -241,7 +240,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       TestUtil.flush();
       var border = tree._rowContainer._getHorizontalGridBorder();
       var row = tree._rowContainer.getRow( 0 );
-      assertIdentical( border, row.getBorder() );
+      assertEquals( border.getWidthBottom(), parseInt( row.$el.css( "borderBottomWidth" ), 10 ) );
+      assertEquals( border.getWidthTop(), parseInt( row.$el.css( "borderTopWidth" ), 10 ) );
       tree.destroy();
     },
 
@@ -272,34 +272,34 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       cont.destroy();
     },
 
-    testSetCellToolTipsEnabled_True : function() {
-      var cont = this._createContainer();
-      cont.setHeight( 100 );
-
-      cont.setCellToolTipsEnabled( true );
-
-      assertEquals( "", getRows( cont )[ 0 ].getToolTipText() );
-    },
-
-    testSetCellToolTipsEnabled_TrueAfterHeightChange : function() {
-      var cont = this._createContainer();
-      cont.setHeight( 100 );
-
-      cont.setCellToolTipsEnabled( true );
-      cont.setHeight( 200 );
-
-      assertEquals( "", cont.getLastChild().getToolTipText() );
-    },
-
-    testSetCellToolTipsEnabled_False : function() {
-      var cont = this._createContainer();
-      cont.setHeight( 100 );
-
-      cont.setCellToolTipsEnabled( true );
-      cont.setCellToolTipsEnabled( false );
-
-      assertNull( getRows( cont )[ 0 ].getToolTipText() );
-    },
+//    testSetCellToolTipsEnabled_True : function() {
+//      var cont = this._createContainer();
+//      cont.setHeight( 100 );
+//
+//      cont.setCellToolTipsEnabled( true );
+//
+//      assertEquals( "", getRows( cont )[ 0 ].getToolTipText() );
+//    },
+//
+//    testSetCellToolTipsEnabled_TrueAfterHeightChange : function() {
+//      var cont = this._createContainer();
+//      cont.setHeight( 100 );
+//
+//      cont.setCellToolTipsEnabled( true );
+//      cont.setHeight( 200 );
+//
+//      assertEquals( "", cont.getLastChild().getToolTipText() );
+//    },
+//
+//    testSetCellToolTipsEnabled_False : function() {
+//      var cont = this._createContainer();
+//      cont.setHeight( 100 );
+//
+//      cont.setCellToolTipsEnabled( true );
+//      cont.setCellToolTipsEnabled( false );
+//
+//      assertNull( getRows( cont )[ 0 ].getToolTipText() );
+//    },
 
     /////////
     // Helper

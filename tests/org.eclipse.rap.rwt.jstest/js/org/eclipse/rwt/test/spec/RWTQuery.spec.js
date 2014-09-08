@@ -12,14 +12,17 @@
 describe( "RWTQuery", function() {
 
   var $ = rwt.util.RWTQuery;
-  var WidgetUtil = rwt.widgets.util.WidgetUtil;
   var Style = rwt.html.Style;
 
   describe( "for widget:", function() {
 
     var widget;
+    var element;
+    var targetNode;
 
     beforeEach( function() {
+      element = null;
+      targetNode = null;
       widget = jasmine.createSpyObj( "widget", [
         "setHtmlAttribute",
         "getHtmlAttributes",
@@ -29,7 +32,16 @@ describe( "RWTQuery", function() {
         "set"
       ] );
       widget.classname = "rwt.widgets.Foo";
-      spyOn( WidgetUtil, "callWithElement" );
+      widget._createElementImpl = function() {
+        targetNode = document.createElement( "div" );
+        element = document.createElement( "div" );
+      };
+      widget._getTargetNode = function() {
+        return targetNode;
+      };
+      widget.getElement = function() {
+        return element;
+      };
     } );
 
     afterEach( function() {
@@ -210,40 +222,31 @@ describe( "RWTQuery", function() {
 
     describe( "append", function() {
 
-      var element;
       var childElement;
 
       beforeEach( function() {
         spyOn( rwt.widgets.base.Widget, "removeFromGlobalElementQueue" );
-        element = null;
         childElement = document.createElement( "div" );
-        widget.getElement = function() {
-          return element;
-        };
       } );
 
-      it( "appends an element to created widget", function() {
-        element = document.createElement( "div" );
+      it( "appends an element to created widget targetNode", function() {
+        widget._createElementImpl();
 
         $( widget ).append( childElement );
 
-        expect( childElement.parentElement ).toBe( element );
+        expect( childElement.parentElement ).toBe( targetNode );
         expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).not.toHaveBeenCalled();
       } );
 
       it( "appends an element by forced widget creation", function() {
-        widget._createElementImpl = function() {
-          element = document.createElement( "div" );
-        };
-
         $( widget ).append( childElement );
 
-        expect( childElement.parentElement ).toBe( element );
+        expect( childElement.parentElement ).toBe( targetNode );
         expect( rwt.widgets.base.Widget.removeFromGlobalElementQueue).toHaveBeenCalledWith( same( widget ) );
       } );
 
       it( "isChainable", function() {
-        element = document.createElement( "div" );
+        widget._createElementImpl();
         var $widget = $( widget );
 
         expect( $widget.append( childElement ) ).toBe( $widget );
@@ -284,6 +287,36 @@ describe( "RWTQuery", function() {
       } );
 
     });
+
+    describe( "text", function() {
+
+      it( "sets textContent", function() {
+        widget._createElementImpl();
+        $( widget ).text( "foo  bar" );
+
+        expect( targetNode.textContent ).toBe( "foo  bar" );
+      } );
+
+      it( "sets textContent before create", function() {
+        $( widget ).text( "foo  bar" );
+
+        expect( targetNode.textContent ).toBe( "foo  bar" );
+      } );
+
+      it( "gets textContent", function() {
+        widget._createElementImpl();
+        targetNode.textContent = "foo  bar";
+
+        expect( $( widget ).text() ).toBe( "foo  bar" );
+      } );
+
+      it( "isChainable", function() {
+        var $widget = $( widget );
+
+        expect( $widget.text( "foo" ) ).toBe( $widget );
+      } );
+
+    } );
 
   } );
 

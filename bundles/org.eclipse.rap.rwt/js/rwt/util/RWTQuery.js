@@ -43,10 +43,11 @@ $.prototype = {
     var isWidget = ( target.classname || "" ).indexOf( "rwt.widgets" ) === 0;
     this.__access = function( args, callbackWidget, callbackElement ) {
       if( isWidget ) {
-        if( callbackWidget ) {
+        if( typeof callbackWidget === "function" ) {
           return callbackWidget.apply( this, [ target, args, privileged ] );
-        } else {
-          var element = get_widget.apply( this, [ target, [ 0 ] ] );
+        } else if( typeof callbackWidget === "string" ) {
+          ensureWidgetElement( target );
+          var element = target[ callbackWidget ]();
           return callbackElement.apply( this, [ element, args, privileged ] );
         }
       }
@@ -71,17 +72,16 @@ $.prototype = {
     return this.__access( arguments, removeAttr_widget, removeAttr_element );
   },
 
-  prop : function() {
-    return this.__access( arguments, null, prop_element );
+  prop : function() { // TODO: widget could use inner outer outer depending on property
+    return this.__access( arguments, "getElement", prop_element );
   },
 
   removeProp : function() {
-    return this.__access( arguments, null, removeProp_element );
+    return this.__access( arguments, "getElement", removeProp_element );
   },
 
-  // TODO: make work against widget targetNode, not getElement (also text),
   append : function() {
-    return this.__access( arguments, null, append_element );
+    return this.__access( arguments, "_getTargetNode", append_element );
   },
 
   css : function() {
@@ -89,15 +89,15 @@ $.prototype = {
   },
 
   text : function() {
-    return this.__access( arguments, null, text_element );
+    return this.__access( arguments, "_getTargetNode", text_element );
   },
 
-  detach : function() {
-    return this.__access( arguments, null, detach_element );
+  detach : function() { // TODO: use setParent for widget instead?
+    return this.__access( arguments, "getElement", detach_element );
   },
 
   "get" : function() {
-    return this.__access( arguments, get_widget, get_element );
+    return this.__access( arguments, "getElement", get_element );
   }
 
 };
@@ -323,15 +323,6 @@ var get_element = function( element, args ) {
   return args.length > 0 ? result[ args[ 0 ] ] : result;
 };
 
-var get_widget = function( widget, args ) {
-  if( !widget.getElement() ) {
-    rwt.widgets.base.Widget.removeFromGlobalElementQueue( widget );
-    widget._createElementImpl();
-  }
-  var result = [ widget.getElement() ];
-  return args.length > 0 ? result[ args[ 0 ] ] : result;
-};
-
 var text_element = function( element, args ) {
   if( args.length === 0 )  {
     return element.textContent;
@@ -405,6 +396,13 @@ var trimAll = function( arr ) {
 var cssCheck = function( passed ) {
   if( !passed ) {
     throw new Error( "Invalid or unsupported css value" );
+  }
+};
+
+var ensureWidgetElement = function( widget ) {
+  if( !widget.getElement() ) {
+    rwt.widgets.base.Widget.removeFromGlobalElementQueue( widget );
+    widget._createElementImpl();
   }
 };
 
