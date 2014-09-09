@@ -224,6 +224,8 @@ org.eclipse.rwt.test.fixture.TestUtil = {
   },
 
   hoverFromTo : function( fromNode, toNode ) {
+    fromNode = this._toElement( fromNode );
+    toNode = this._toElement( toNode );
     var outEvent = this._createFakeMouseEventDOM( fromNode, "mouseout", 0 );
     outEvent.relatedTarget = toNode;
     this.fireFakeDomEvent( outEvent );
@@ -394,16 +396,16 @@ org.eclipse.rwt.test.fixture.TestUtil = {
   },
 
   _sendKeyDownOnHold : rwt.util.Variant.select("qx.client", {
-    "default" : function( key ) {
+    "default" : function() {
       return true;
     },
-    "opera" : function( key ) {
+    "opera" : function() {
       return false;
     }
   } ),
 
   _sendKeyPress : rwt.util.Variant.select("qx.client", {
-    "gecko|opera" : function( key, keyDownEvent ) {
+    "gecko|opera" : function( key ) {
       return !this._isModifier( key );
     },
     "default" : function( key, keyDownEvent ) {
@@ -454,7 +456,7 @@ org.eclipse.rwt.test.fixture.TestUtil = {
   } ),
 
   _getCharCode : rwt.util.Variant.select("qx.client", {
-    "default" : function( type, stringOrKeyCode ) {
+    "default" : function() {
       return undefined;
     },
     "gecko|webkit" : function( type, stringOrKeyCode ) {
@@ -711,6 +713,7 @@ org.eclipse.rwt.test.fixture.TestUtil = {
     if( target.$inner ) {
       return target.$inner.get( 0 );
     }
+    return target;
   },
 
   ////////////////
@@ -842,7 +845,6 @@ org.eclipse.rwt.test.fixture.TestUtil = {
   // assumes that the set appearance-theme does never change during tests
   fakeAppearance : function( appearanceId, value ) {
     var manager = rwt.theme.AppearanceManager.getInstance();
-    var themeName = manager.getCurrentTheme().name;
     var base = manager.getCurrentTheme().appearances;
     if( typeof this._appearanceBackups[ appearanceId ] == "undefined" ) {
       if( base[ appearanceId ] ) {

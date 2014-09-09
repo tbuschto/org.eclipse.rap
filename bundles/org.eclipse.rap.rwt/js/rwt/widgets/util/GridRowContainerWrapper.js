@@ -67,7 +67,9 @@ rwt.widgets.util.GridRowContainerWrapper._CONTAINER_DELEGATES = [
   "setToolTip",
   "renderItemQueue",
   "setBaseAppearance",
-  "setCellToolTipsEnabled"
+  "setCellToolTipsEnabled",
+  "getRow",
+  "getRowCount"
 ];
 
 rwt.widgets.util.GridRowContainerWrapper._CONTAINER_GETTER_DELEGATES = [

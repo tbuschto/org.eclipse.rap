@@ -501,12 +501,9 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
     _onMouseDown : function( event ) {
       this._delayedSelection = false;
       if( !this._checkAndProcessHyperlink( event ) ) {
-        var target = event.getDomTarget();
-        while( target && !target.row && !target.rwtWidget ) {
-          target = target.parentElement;
-        }
-        if( target.row ) {
-          this._onRowMouseDown( target.row, event );
+        var row = this._rowContainer.findRowByElement( event.getDomTarget() );
+        if( row ) {
+          this._onRowMouseDown( row, event );
         }
       }
     },
@@ -907,7 +904,7 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
     },
 
     _updateScrollThumbHeight : function() {
-      var value = Math.max( 1, this._rowContainer.getChildrenLength() - 1 );
+      var value = Math.max( 1, this._rowContainer.getRowCount() - 1 );
       this._vertScrollBar.setThumb( value );
     },
 

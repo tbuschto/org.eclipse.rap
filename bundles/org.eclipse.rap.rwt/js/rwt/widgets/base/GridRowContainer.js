@@ -17,6 +17,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
   construct : function() {
     this.base( arguments );
     // Don't use $ to wrap widget, we need to be able to address inner and outer element separately
+    // TODO: this is sort of abusing the enhancedBorder feature. $inner should be created explicitly
     this.enableEnhancedBorder();
     this.$outer = $( $( this ).get( 0 ) ); // also forces widget creation, enables next line:
     this.$inner = new rwt.util._RWTQuery( this._getTargetNode() );
@@ -38,11 +39,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     this._asyncTimer = new rwt.client.Timer( 0 );
     this._asyncTimer.addEventListener( "interval", this._onAsyncTimer, this );
     this._hoverItem = null;
-    this._hoverElement = null;
+    this._hoverTargetType = [];
     this._config = rwt.widgets.base.GridRowContainer.createRenderConfig();
-    this.addEventListener( "mouseover", this._onRowOver, this );
-    this.addEventListener( "mouseout", this._onRowOver, this );
     this.addEventListener( "elementOver", this._onElementOver, this );
+    this.addEventListener( "elementOut", this._onElementOut, this );
   },
 
   destruct : function() {
@@ -54,7 +54,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     this._renderTime = null;
     this._items = null;
     this._hoverItem = null;
-    this._hoverElement = null;
+    this._hoverTargetType = null;
     this._asyncTimer.dispose();
     this._asyncTimer = null;
   },
@@ -99,6 +99,29 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     /////////////
     // Public API
+
+    setTopItem : function( item, index, render ) {
+      // TODO [tb] : write test for optimized render
+      this._topItem = item;
+      if( render ) {
+        var delta = index - this._topItemIndex;
+        this._topItemIndex = index;
+        var forwards = delta > 0;
+        delta = Math.abs( delta );
+        if( delta >= this.getRowCount() ) {
+          this._renderAll( true );
+        } else {
+          var numberOfShiftingRows = this.getRowCount() - delta;
+          var updateFromRow = forwards ? numberOfShiftingRows : 0;
+          var newFirstRow = forwards ? delta : numberOfShiftingRows;
+          this._switchRows( newFirstRow );
+          this._updateRows( updateFromRow, delta, true );
+          this._renderBounds( true );
+        }
+      } else {
+        this._topItemIndex = index;
+      }
+    },
 
     /**
      * Returns a map with values for treeRow configuration. (see _createRenderConfig).
@@ -169,107 +192,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       return this.$inner.prop( "children" )[ index ][ "row" ];
     },
 
-    _renderGridVertical : function() {
-      var linesNeeded = this._config.linesVisible ? this._config.columnCount : 0;
-      for( var i = 0; i < linesNeeded; i++ ) {
-        this._renderVerticalGridline( i );
+    findRowByElement : function( target ) {
+      while( target && !target.row && !target.rwtWidget ) {
+        target = target.parentElement;
       }
-      for( var i = linesNeeded; i < this._vertGridLines.length; i++ ) {
-        this._removeGridLine( i );
-      }
-    },
-
-    _renderVerticalGridline : function( column ) {
-      var width = this._config.itemWidth[ column ];
-      var left = this._config.itemLeft[ column ] + width - 1;
-      if( width > 0 ) {
-        var line = this._getVerticalGridline( column );
-        line.style.left = left + "px";
-        line.style.height = this.getHeight() + "px";
-      } else {
-        this._removeGridLine( column );
-      }
-    },
-
-    _getVerticalGridline : function( column ) {
-      if( typeof this._vertGridLines[ column ] === "undefined" ) {
-        var line = document.createElement( "div" );
-        line.style.zIndex = 1;
-        line.style.position = "absolute";
-        line.style.top = "0px";
-        line.style.width = "0px";
-        this._getVerticalGridBorder().renderElement( line );
-        // Important: add to outer element to keep the row-to-children mapping intact
-        this.$outer.append( line );
-        this._vertGridLines[ column ] = line;
-      }
-      return this._vertGridLines[ column ];
-    },
-
-    _removeGridLine : function( column ) {
-      if( this._vertGridLines[ column ] ) {
-        this._getTargetNode().removeChild( this._vertGridLines[ column ] );
-        delete this._vertGridLines[ column ];
-      }
-    },
-
-    _getVerticalGridBorder : function() {
-      if( this._vertGridBorder === null ) {
-        this._vertGridBorder = this._getGridBorder( { "vertical" : true } );
-      }
-      return this._vertGridBorder;
-    },
-
-    _getHorizontalGridBorder : function() {
-      if( this._horzGridBorder === null ) {
-        this._horzGridBorder = this._getGridBorder( { "horizontal" : true } );
-      }
-      return this._horzGridBorder;
-    },
-
-    _getGridBorder : function( state ) {
-      if( this._config.rowTemplate ) {
-        state.rowtemplate = true;
-      }
-      var tvGrid = new rwt.theme.ThemeValues( state );
-      var cssElement = rwt.util.Strings.toFirstUp( this._baseAppearance ) + "-GridLine";
-      var gridColor = tvGrid.getCssColor( cssElement, "color" );
-      tvGrid.dispose();
-      var borderWidths = [ 0, 0, 0, 0 ];
-      gridColor = gridColor == "undefined" ? "transparent" : gridColor;
-      if( state.horizontal ) {
-        borderWidths[ 2 ] = 1;
-      } else if( state.vertical ) {
-        borderWidths[ 1 ] = 1;
-      }
-      return new rwt.html.Border( borderWidths, "solid", gridColor );
-    },
-
-    _getRowAppearance : function() {
-      return this._baseAppearance + "-row";
-    },
-
-    setTopItem : function( item, index, render ) {
-      // TODO [tb] : write test for optimized render
-      this._topItem = item;
-      if( render ) {
-        var delta = index - this._topItemIndex;
-        this._topItemIndex = index;
-        var forwards = delta > 0;
-        delta = Math.abs( delta );
-        if( delta >= this.getRowCount() ) {
-          this._renderAll( true );
-        } else {
-          var numberOfShiftingRows = this.getRowCount() - delta;
-          var updateFromRow = forwards ? numberOfShiftingRows : 0;
-          var newFirstRow = forwards ? delta : numberOfShiftingRows;
-          this._switchRows( newFirstRow );
-          this._updateRows( updateFromRow, delta, true );
-          this._renderBounds( true );
-        }
-      } else {
-        this._topItemIndex = index;
-      }
+      return target ? target.row : null;
     },
 
     renderAll : function() {
@@ -317,12 +244,94 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       return this._hoverItem;
     },
 
-    // NOTE: Used only by TreeUtil.js
     setHoverItem : function( item ) {
       if( item ) {
-        this._hoverElement = [ "other" ];
+        this._hoverTargetType = [ "other" ];
       }
       this._setHoverItem( item );
+    },
+
+    ///////////
+    // Internal
+
+    _renderGridVertical : function() {
+      var linesNeeded = this._config.linesVisible ? this._config.columnCount : 0;
+      for( var i = 0; i < linesNeeded; i++ ) {
+        this._renderVerticalGridline( i );
+      }
+      for( var i = linesNeeded; i < this._vertGridLines.length; i++ ) {
+        this._removeGridLine( i );
+      }
+    },
+
+    _renderVerticalGridline : function( column ) {
+      var width = this._config.itemWidth[ column ];
+      var left = this._config.itemLeft[ column ] + width - 1;
+      if( width > 0 ) {
+        var line = this._getVerticalGridline( column );
+        line.style.left = left + "px";
+        line.style.height = this.getHeight() + "px";
+      } else {
+        this._removeGridLine( column );
+      }
+    },
+
+    _getVerticalGridline : function( column ) {
+      if( typeof this._vertGridLines[ column ] === "undefined" ) {
+        var line = document.createElement( "div" );
+        line.style.zIndex = 1;
+        line.style.position = "absolute";
+        line.style.top = "0px";
+        line.style.width = "0px";
+        this._getVerticalGridBorder().renderElement( line );
+        // Important: add to outer element to keep the row-to-children mapping intact
+        this.$outer.append( line );
+        this._vertGridLines[ column ] = line;
+      }
+      return this._vertGridLines[ column ];
+    },
+
+    _removeGridLine : function( column ) {
+      if( this._vertGridLines[ column ] ) {
+        this.getElement().removeChild( this._vertGridLines[ column ] );
+        delete this._vertGridLines[ column ];
+      }
+    },
+
+    _getVerticalGridBorder : function() {
+      if( this._vertGridBorder === null ) {
+        this._vertGridBorder = this._getGridBorder( { "vertical" : true } );
+      }
+      return this._vertGridBorder;
+    },
+
+    _getHorizontalGridBorder : function() {
+      if( this._horzGridBorder === null ) {
+        this._horzGridBorder = this._getGridBorder( { "horizontal" : true } );
+      }
+      return this._horzGridBorder;
+    },
+
+    _getGridBorder : function( state ) {
+      if( this._config.rowTemplate ) {
+        state.rowtemplate = true;
+      }
+      var tvGrid = new rwt.theme.ThemeValues( state );
+      var cssElement = rwt.util.Strings.toFirstUp( this._baseAppearance ) + "-GridLine";
+      var gridColor = tvGrid.getCssColor( cssElement, "color" );
+      tvGrid.dispose();
+      var borderWidths = [ 0, 0, 0, 0 ];
+      gridColor = gridColor == "undefined" ? "transparent" : gridColor;
+      if( state.horizontal ) {
+        borderWidths[ 2 ] = 1;
+      } else if( state.vertical ) {
+        borderWidths[ 1 ] = 1;
+      }
+      return new rwt.html.Border( borderWidths, "solid", gridColor );
+    },
+
+    _getRowAppearance : function() {
+      return this._baseAppearance + "-row";
     },
 
     ////////////
@@ -417,30 +426,24 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     _onElementOver : function( event ) {
-      var target = event.getTarget();
-      var internal = target === event.getRelatedTarget();
-      if( target instanceof rwt.widgets.base.GridRow && internal && this._hoverItem ) {
-        var hoverElement = target.getTargetIdentifier( event );
-        if( this._hoverElement[ 0 ] !== hoverElement[ 0 ] ) {
-          this._hoverElement = hoverElement;
-          this._setHoverItem( this._hoverItem );
+      var target = event.getDomTarget();
+      var row = this.findRowByElement( target );
+      if( row ) {
+        var item = this.findItemByRow( row );
+        var targetTypes = row.identify( target );
+        if( item !== this._hoverItem || this._hoverTargetType[ 0 ] !== targetTypes[ 0 ] ) {
+          this._hoverTargetType = targetTypes;
+          this._setHoverItem( item );
         }
       }
     },
 
-    _onRowOver : function( event ) {
-      var target = event.getOriginalTarget();
-      if( target instanceof rwt.widgets.base.GridRow ) {
-        if( event.getType() === "mouseout" ) {
-          this._hoverElement = null;
-          this._setHoverItem( null );
-        } else {
-          this._hoverElement = target.getTargetIdentifier( event );
-          var item = this.findItemByRow( target );
-          if( item !== this._hoverItem ) { // can happen due to use of innerHTML/replacing elements
-            this._setHoverItem( item );
-          }
-        }
+    _onElementOut : function( event ) {
+      var target = event.getDomEvent();
+      var related = rwt.event.EventHandlerUtil.getRelatedTargetObjectFromEvent( target );
+      if( !this.findRowByElement( related ) ) {
+        this._hoverTargetType = [];
+        this._setHoverItem( null );
       }
     },
 
@@ -456,7 +459,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     _getHoverElement : function( item ) {
       var result = null;
       if( this._hoverItem === item ) {
-        result = this._hoverElement;
+        result = this._hoverTargetType;
       }
       return result;
     },

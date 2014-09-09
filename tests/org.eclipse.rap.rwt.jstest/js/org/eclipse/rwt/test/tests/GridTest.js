@@ -134,100 +134,100 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       shell.destroy();
     },
 
-//    testSendSelectionEventForClickableRowTemplateCell : function() {
-//      var cellData = {
-//        "type" : "text",
-//        "bindingIndex" : 0,
-//        "name" : "bar",
-//        "selectable" : true,
-//        "left" : [ 0, 0 ],
-//        "top" : [ 0, 0 ],
-//        "width" : 1,
-//        "height" : 1
-//      };
-//      var template = new rwt.widgets.util.Template( [ cellData ] );
-//      var tree = this._createDefaultTree( false, false, "rowTemplate", template );
-//      TestUtil.fakeListener( tree, "Selection", true );
-//      tree.setItemCount( 1 );
-//      var item = this._createItem( tree.getRootItem(), 0 );
-//      item.setTexts( [ "foo" ] );
-//      rwt.remote.ObjectRegistry.add( "w4", item, itemHandler );
-//      TestUtil.flush();
-//
-//      var node = tree._rowContainer._getTargetNode().childNodes[ 0 ].childNodes[ 0 ];
-//      TestUtil.clickDOM( node );
-//
-//      assertEquals( 1, TestUtil.getRequestsSend() );
-//      var message = TestUtil.getMessageObject();
-//      assertNull( message.findSetOperation( "w3", "selection" ) );
-//      assertEquals( "w4", message.findNotifyProperty( "w3", "Selection", "item" ) );
-//      assertEquals( "cell", message.findNotifyProperty( "w3", "Selection", "detail" ) );
-//      var text = message.findNotifyProperty( "w3", "Selection", "text" );
-//      assertEquals( "bar", text );
-//      tree.destroy();
-//    },
-//
-//    testSendSelectionEventForNonClickableRowTemplateCell : function() {
-//      var cellData = {
-//        "type" : "text",
-//        "bindingIndex" : 0,
-//        "name" : "bar",
-//        "left" : [ 0, 0 ],
-//        "top" : [ 0, 0 ],
-//        "width" : 1,
-//        "height" : 1
-//      };
-//      var template = new rwt.widgets.util.Template( [ cellData ] );
-//      var tree = this._createDefaultTree( false, false, "rowTemplate", template );
-//      tree.getRenderConfig().fullSelection = false;
-//      TestUtil.fakeListener( tree, "Selection", true );
-//      tree.setItemCount( 1 );
-//      var item = this._createItem( tree.getRootItem(), 0 );
-//      item.setTexts( [ "foo" ] );
-//      rwt.remote.ObjectRegistry.add( "w4", item, itemHandler );
-//      TestUtil.flush();
-//
-//      var node = tree._rowContainer._getTargetNode().childNodes[ 0 ].childNodes[ 0 ];
-//      TestUtil.clickDOM( node );
-//
-//      var message = TestUtil.getMessageObject();
-//      assertEquals( [ "w4" ], message.findSetProperty( "w3", "selection" ) );
-//      assertEquals( "w4", message.findNotifyProperty( "w3", "Selection", "item" ) );
-//      assertTrue( message.findNotifyProperty( "w3", "Selection", "detail" ) == null );
-//      tree.destroy();
-//    },
-//
-//    testSendSelectionEventForClickableRowTemplateCell_withoutName : function() {
-//      var cellData = {
-//        "type" : "text",
-//        "bindingIndex" : 0,
-//        "selectable" : true,
-//        "left" : [ 0, 0 ],
-//        "top" : [ 0, 0 ],
-//        "width" : 1,
-//        "height" : 1
-//      };
-//      var template = new rwt.widgets.util.Template( [ cellData ] );
-//      var tree = this._createDefaultTree( false, false, "rowTemplate", template );
-//      TestUtil.fakeListener( tree, "Selection", true );
-//      tree.setItemCount( 1 );
-//      var item = this._createItem( tree.getRootItem(), 0 );
-//      item.setTexts( [ "foo" ] );
-//      rwt.remote.ObjectRegistry.add( "w4", item, itemHandler );
-//      TestUtil.flush();
-//
-//      var node = tree._rowContainer._getTargetNode().childNodes[ 0 ].childNodes[ 0 ];
-//      TestUtil.clickDOM( node );
-//
-//      assertEquals( 1, TestUtil.getRequestsSend() );
-//      var message = TestUtil.getMessageObject();
-//      assertNull( message.findSetOperation( "w3", "selection" ) );
-//      assertEquals( "w4", message.findNotifyProperty( "w3", "Selection", "item" ) );
-//      assertEquals( "cell", message.findNotifyProperty( "w3", "Selection", "detail" ) );
-//      assertTrue( message.findNotifyProperty( "w3", "Selection", "text" ) === undefined );
-//      tree.destroy();
-//    },
-//
+    testSendSelectionEventForClickableRowTemplateCell : function() {
+      var cellData = {
+        "type" : "text",
+        "bindingIndex" : 0,
+        "name" : "bar",
+        "selectable" : true,
+        "left" : [ 0, 0 ],
+        "top" : [ 0, 0 ],
+        "width" : 1,
+        "height" : 1
+      };
+      var template = new rwt.widgets.util.Template( [ cellData ] );
+      var tree = this._createDefaultTree( false, false, "rowTemplate", template );
+      TestUtil.fakeListener( tree, "Selection", true );
+      tree.setItemCount( 1 );
+      var item = this._createItem( tree.getRootItem(), 0 );
+      item.setTexts( [ "foo" ] );
+      rwt.remote.ObjectRegistry.add( "w4", item, itemHandler );
+      TestUtil.flush();
+
+      var node = tree._rowContainer._getTargetNode().childNodes[ 0 ].childNodes[ 0 ];
+      TestUtil.clickDOM( node );
+
+      assertEquals( 1, TestUtil.getRequestsSend() );
+      var message = TestUtil.getMessageObject();
+      assertNull( message.findSetOperation( "w3", "selection" ) );
+      assertEquals( "w4", message.findNotifyProperty( "w3", "Selection", "item" ) );
+      assertEquals( "cell", message.findNotifyProperty( "w3", "Selection", "detail" ) );
+      var text = message.findNotifyProperty( "w3", "Selection", "text" );
+      assertEquals( "bar", text );
+      tree.destroy();
+    },
+
+    testSendSelectionEventForNonClickableRowTemplateCell : function() {
+      var cellData = {
+        "type" : "text",
+        "bindingIndex" : 0,
+        "name" : "bar",
+        "left" : [ 0, 0 ],
+        "top" : [ 0, 0 ],
+        "width" : 1,
+        "height" : 1
+      };
+      var template = new rwt.widgets.util.Template( [ cellData ] );
+      var tree = this._createDefaultTree( false, false, "rowTemplate", template );
+      tree.getRenderConfig().fullSelection = false;
+      TestUtil.fakeListener( tree, "Selection", true );
+      tree.setItemCount( 1 );
+      var item = this._createItem( tree.getRootItem(), 0 );
+      item.setTexts( [ "foo" ] );
+      rwt.remote.ObjectRegistry.add( "w4", item, itemHandler );
+      TestUtil.flush();
+
+      var node = tree._rowContainer._getTargetNode().childNodes[ 0 ].childNodes[ 0 ];
+      TestUtil.clickDOM( node );
+
+      var message = TestUtil.getMessageObject();
+      assertEquals( [ "w4" ], message.findSetProperty( "w3", "selection" ) );
+      assertEquals( "w4", message.findNotifyProperty( "w3", "Selection", "item" ) );
+      assertTrue( message.findNotifyProperty( "w3", "Selection", "detail" ) == null );
+      tree.destroy();
+    },
+
+    testSendSelectionEventForClickableRowTemplateCell_withoutName : function() {
+      var cellData = {
+        "type" : "text",
+        "bindingIndex" : 0,
+        "selectable" : true,
+        "left" : [ 0, 0 ],
+        "top" : [ 0, 0 ],
+        "width" : 1,
+        "height" : 1
+      };
+      var template = new rwt.widgets.util.Template( [ cellData ] );
+      var tree = this._createDefaultTree( false, false, "rowTemplate", template );
+      TestUtil.fakeListener( tree, "Selection", true );
+      tree.setItemCount( 1 );
+      var item = this._createItem( tree.getRootItem(), 0 );
+      item.setTexts( [ "foo" ] );
+      rwt.remote.ObjectRegistry.add( "w4", item, itemHandler );
+      TestUtil.flush();
+
+      var node = tree._rowContainer._getTargetNode().childNodes[ 0 ].childNodes[ 0 ];
+      TestUtil.clickDOM( node );
+
+      assertEquals( 1, TestUtil.getRequestsSend() );
+      var message = TestUtil.getMessageObject();
+      assertNull( message.findSetOperation( "w3", "selection" ) );
+      assertEquals( "w4", message.findNotifyProperty( "w3", "Selection", "item" ) );
+      assertEquals( "cell", message.findNotifyProperty( "w3", "Selection", "detail" ) );
+      assertTrue( message.findNotifyProperty( "w3", "Selection", "text" ) === undefined );
+      tree.destroy();
+    },
+
 //    testGridWithRowTempalteLimitsRowWidth : function() {
 //      var cellData = { "type" : "text", "left" : [ 0, 0 ], "top" : [ 0, 0 ], "width" : 1, "height" : 1 };
 //      var template = new rwt.widgets.util.Template( [ cellData ] );
@@ -2555,12 +2555,12 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       var item = this._createItem( tree.getRootItem(), 0 );
       item.setTexts( [ "bla" ] );
       item.setImages( [ [ "bla.jpg", 10, 10 ] ] );
-      assertNull( tree._rowContainer._hoverElement );
+      assertEquals( 0, tree._rowContainer._hoverTargetType.length );
       TestUtil.flush();
       var rowNode = tree._rowContainer.getRow( 0 ).$el.get( 0 );
       TestUtil.hoverFromTo( document.body, rowNode );
       TestUtil.hoverFromTo( rowNode, rowNode.firstChild );
-      assertEquals( "other", tree._rowContainer._hoverElement[ 0 ] );
+      assertEquals( "other", tree._rowContainer._hoverTargetType[ 0 ] );
       tree.destroy();
     },
 
@@ -2584,7 +2584,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.mouseOver( tree._rowContainer.getRow( 0 ) );
       TestUtil.forceInterval( tree._rowContainer._asyncTimer );
       assertEquals( "red", style.backgroundColor );
-      TestUtil.mouseOut( tree._rowContainer.getRow( 0 ) );
+      TestUtil.hoverFromTo( tree._rowContainer.getRow( 0 ), document.body );
       TestUtil.forceInterval( tree._rowContainer._asyncTimer );
       assertEquals( "green", style.backgroundColor );
       tree.destroy();
@@ -3120,7 +3120,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       var item = this._createItem( tree.getRootItem(), 0 );
       item.setTexts( [ "Test1" ] );
       TestUtil.flush();
-      var node = tree._rowContainer.getRow( 0 ).getElement();
+      var node = tree._rowContainer.getRow( 0 ).$el.get( 0 );
       assertEquals( "red", node.style.color );
       tree.setTextColor( "blue" );
       TestUtil.flush();
@@ -3143,7 +3143,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.flush();
       assertTrue( font.indexOf( "fantasy" ) != -1 );
       tree.destroy();
-      row.destroy();
+      row.dispose();
     },
 
     testDisposeTreeColumn : function() {
@@ -3268,7 +3268,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.flush();
       assertEquals( "center", node.style.textAlign );
       tree.destroy();
-      row.destroy();
+      row.dispose();
     },
 
     testSendScrollLeft : function() {
@@ -3476,20 +3476,18 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       var tree = this._createDefaultTree();
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
       tree.setLinesVisible( true );
       TestUtil.flush();
-      assertEquals( offset + 3, tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( 3, tree._rowContainer.getElement().childNodes.length - 1 );
       tree.destroy();
     },
 
     testGridLinesVerticalDefaultProperties : function() {
       var tree = this._createDefaultTree();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
       tree.setColumnCount( 3 );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var line = tree._rowContainer._getTargetNode().childNodes[ offset ];
+      var line = tree._rowContainer.getElement().childNodes[ 1 ];
       assertEquals( 1, parseInt( line.style.zIndex, 10 ) );
       assertEquals( "0px", line.style.width );
       assertTrue( line.style.border !== "" || line.style.borderRight !== "" );
@@ -3498,51 +3496,51 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
 
     testAddGridLinesVertical : function() {
       var tree = this._createDefaultTree();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
+      var offset = 1;
       tree.setLinesVisible( true );
       tree.setColumnCount( 1 );
       TestUtil.flush();
-      assertEquals( offset + 1, tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( offset + 1, tree._rowContainer.getElement().childNodes.length );
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      assertEquals( offset + 3  , tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( offset + 3  , tree._rowContainer.getElement().childNodes.length );
       tree.destroy();
     },
 
     testRemoveGridLinesVertical : function() {
       var tree = this._createDefaultTree();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
+      var offset = 1;
       tree.setLinesVisible( true );
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      assertEquals( offset + 3, tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( offset + 3, tree._rowContainer.getElement().childNodes.length );
       tree.setColumnCount( 1 );
       TestUtil.flush();
-      assertEquals( offset + 1, tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( offset + 1, tree._rowContainer.getElement().childNodes.length );
       tree.destroy();
     },
 
     testDisableGridLinesVertical : function() {
       var tree = this._createDefaultTree();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
+      var offset = 1;
       tree.setLinesVisible( true );
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      assertEquals( offset + 3, tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( offset + 3, tree._rowContainer.getElement().childNodes.length );
       tree.setLinesVisible( false );
       TestUtil.flush();
-      assertEquals( offset, tree._rowContainer._getTargetNode().childNodes.length );
+      assertEquals( offset, tree._rowContainer.getElement().childNodes.length );
       tree.destroy();
     },
 
     testGridLinesVerticalLayoutY : function() {
       var tree = this._createDefaultTree();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
+      var offset = 1;
       tree.setWidth( 1000 );
       tree.setColumnCount( 3 );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var line = tree._rowContainer._getTargetNode().childNodes[ offset ];
+      var line = tree._rowContainer.getElement().childNodes[ offset ];
       assertEquals( "0px", line.style.top );
       assertEquals( "500px", line.style.height );
       tree.setHeaderHeight( 20 );
@@ -3560,16 +3558,16 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
 
     testGridLinesVerticalPositionX : function() {
       var tree = this._createDefaultTree();
-      var offset = tree._rowContainer._getTargetNode().childNodes.length;
+      var offset = 1;
       tree.setColumnCount( 3 );
       tree.setLinesVisible( true );
       tree.setItemMetrics( 0, 0, 202, 0, 0, 0, 400 );
       tree.setItemMetrics( 1, 205, 100, 0, 0, 0, 400 );
       tree.setItemMetrics( 2, 310, 50, 0, 0, 0, 400 );
       TestUtil.flush();
-      var line1 = tree._rowContainer._getTargetNode().childNodes[ offset ];
-      var line2 = tree._rowContainer._getTargetNode().childNodes[ offset + 1 ];
-      var line3 = tree._rowContainer._getTargetNode().childNodes[ offset + 2 ];
+      var line1 = tree._rowContainer.getElement().childNodes[ offset ];
+      var line2 = tree._rowContainer.getElement().childNodes[ offset + 1 ];
+      var line3 = tree._rowContainer.getElement().childNodes[ offset + 2 ];
       assertEquals( 201, parseInt( line1.style.left, 10 ) );
       assertEquals( 304, parseInt( line2.style.left, 10 ) );
       assertEquals( 359, parseInt( line3.style.left, 10 ) );
@@ -3599,9 +3597,9 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       var rows = tree._rowContainer.$inner.prop( "children" );
       TestUtil.click( rows[ 0 ] );
       TestUtil.shiftClick( rows[ 2 ] );
-      assertEquals( "blue", rows[ 0 ].getElement().style.backgroundColor );
-      assertEquals( "blue", rows[ 1 ].getElement().style.backgroundColor );
-      assertEquals( "blue", rows[ 2 ].getElement().style.backgroundColor );
+      assertEquals( "blue", rows[ 0 ].style.backgroundColor );
+      assertEquals( "blue", rows[ 1 ].style.backgroundColor );
+      assertEquals( "blue", rows[ 2 ].style.backgroundColor );
       tree.destroy();
     },
 
@@ -3817,7 +3815,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.flush();
       assertEquals( 26, tree._rowContainer.$inner.prop( "children" ).length );
       assertIdentical( root.getChild( 0 ), tree._rowContainer._topItem );
-      TestUtil.clickDOM( tree._rowContainer.$inner.prop( "children" )[ 23 ]._getTargetNode() );
+      TestUtil.clickDOM( tree._rowContainer.$inner.prop( "children" )[ 23 ] );
       assertTrue( tree.isItemSelected( root.getChild( 23 ) ) );
       assertTrue( tree.isFocusItem( root.getChild( 23 ) ) );
       TestUtil.press( tree, "Down" );
@@ -4183,7 +4181,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.destroy();
     },
 
-
     testDeselectionOnCollapseByMouse : function() {
       var tree = this._createDefaultTree( false, false, "multiSelection" );
       TestUtil.fakeAppearance( "tree-row-indent",  {
@@ -4477,37 +4474,37 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.destroy();
     },
 
-    testRequestCellToolTipText : function() {
-      var tree = this._createDefaultTree();
-      var widgetManager = rwt.remote.WidgetManager.getInstance();
-      widgetManager.add( tree, "w3", true );
-      tree.setEnableCellToolTip( true );
-      tree.setColumnCount( 6 );
-      tree.setItemMetrics( 0, 0, 5, 0, 0, 0, 50 );
-      tree.setItemMetrics( 1, 5, 10, 0, 0, 0, 50 );
-      tree.setItemMetrics( 2, 15, 10, 0, 0, 0, 50 );
-      tree.setItemMetrics( 3, 25, 10, 0, 0, 0, 50 );
-      tree.setItemMetrics( 4, 35, 350, 0, 0, 0, 50 );
-      tree.setItemMetrics( 5, 400, 100, 405, 10, 430, 50 );
-      tree.setItemCount( 1 );
-      var item = this._createItem( tree.getRootItem(), 0 );
-      widgetManager.add( item, "w45", true );
-      TestUtil.flush();
-      var leftButton = rwt.event.MouseEvent.buttons.left;
-      var node = tree._rowContainer.getChildren()[ 0 ].getElement();
-
-      TestUtil.fakeMouseEventDOM( node, "mouseover", leftButton, 450, 11 );
-      TestUtil.fakeMouseEventDOM( node, "mousemove", leftButton, 450, 11 );
-      TestUtil.forceInterval( rwt.widgets.base.WidgetToolTip.getInstance()._showTimer );
-
-      assertEquals( 1, TestUtil.getRequestsSend() );
-      var message = TestUtil.getMessageObject( 0 );
-      var actualItem = message.findCallProperty( "w3", "renderToolTipText", "item" );
-      var actualCol = message.findCallProperty( "w3", "renderToolTipText", "column" );
-      assertEquals( "w45", actualItem );
-      assertEquals( 5, actualCol );
-      tree.destroy();
-    },
+//    testRequestCellToolTipText : function() {
+//      var tree = this._createDefaultTree();
+//      var widgetManager = rwt.remote.WidgetManager.getInstance();
+//      widgetManager.add( tree, "w3", true );
+//      tree.setEnableCellToolTip( true );
+//      tree.setColumnCount( 6 );
+//      tree.setItemMetrics( 0, 0, 5, 0, 0, 0, 50 );
+//      tree.setItemMetrics( 1, 5, 10, 0, 0, 0, 50 );
+//      tree.setItemMetrics( 2, 15, 10, 0, 0, 0, 50 );
+//      tree.setItemMetrics( 3, 25, 10, 0, 0, 0, 50 );
+//      tree.setItemMetrics( 4, 35, 350, 0, 0, 0, 50 );
+//      tree.setItemMetrics( 5, 400, 100, 405, 10, 430, 50 );
+//      tree.setItemCount( 1 );
+//      var item = this._createItem( tree.getRootItem(), 0 );
+//      widgetManager.add( item, "w45", true );
+//      TestUtil.flush();
+//      var leftButton = rwt.event.MouseEvent.buttons.left;
+//      var node = tree._rowContainer.getRow( 0 ).$el.get( 0 );
+//
+//      TestUtil.fakeMouseEventDOM( node, "mouseover", leftButton, 450, 11 );
+//      TestUtil.fakeMouseEventDOM( node, "mousemove", leftButton, 450, 11 );
+//      TestUtil.forceInterval( rwt.widgets.base.WidgetToolTip.getInstance()._showTimer );
+//
+//      assertEquals( 1, TestUtil.getRequestsSend() );
+//      var message = TestUtil.getMessageObject( 0 );
+//      var actualItem = message.findCallProperty( "w3", "renderToolTipText", "item" );
+//      var actualCol = message.findCallProperty( "w3", "renderToolTipText", "column" );
+//      assertEquals( "w45", actualItem );
+//      assertEquals( 5, actualCol );
+//      tree.destroy();
+//    },
 
     testSendSelectedEventHorizontal : function() {
       TestUtil.createShellByProtocol( "w2" );
