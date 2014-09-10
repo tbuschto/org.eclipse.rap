@@ -42,6 +42,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
     testCreateRow : function() {
       expect( row.$el.get( 0 ) ).toBeTruthy();
       assertEquals( "hidden", row.$el.css( "overflow" ) );
+      assertEquals( "relative", row.$el.css( "position" ) );
       assertEquals( 0, row.$el.get( 0 ).childNodes.length );
     },
 

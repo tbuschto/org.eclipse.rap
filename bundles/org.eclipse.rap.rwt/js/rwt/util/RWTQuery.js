@@ -84,16 +84,28 @@ rwt.util._RWTQuery.prototype = $.prototype = {
     return this.__access( arguments, "_getTargetNode", append_element );
   },
 
+  prepend : function() {
+    return this.__access( arguments, "_getTargetNode", prepend_element );
+  },
+
+  detach : function() {
+    return this.__access( arguments, null, detach_element );
+  },
+
+  insertAfter : function() {
+    return this.__access( arguments, null, insertAfter_element );
+  },
+
+  insertBefore : function() {
+    return this.__access( arguments, null, insertBefore_element );
+  },
+
   css : function() {
     return this.__access( arguments, css_widget, css_element );
   },
 
   text : function() {
     return this.__access( arguments, "_getTargetNode", text_element );
-  },
-
-  detach : function() { // TODO: use setParent for widget instead?
-    return this.__access( arguments, "getElement", detach_element );
   },
 
   "get" : function() {
@@ -308,8 +320,24 @@ var css_element = unwrapSetterArgsFor( function( element, args ) {
 } );
 
 var append_element = function( element, args ) {
-  var child = args[ 0 ] instanceof $ ? args[ 0 ].get( 0 ) : args[ 0 ];
-  element.appendChild( child );
+  element.appendChild( asElement( args[ 0 ] ) );
+  return this;
+};
+
+var prepend_element = function( element, args ) {
+  element.insertBefore( asElement( args[ 0 ] ), element.firstChild );
+  return this;
+};
+
+var insertAfter_element = function( element, args ) {
+  var reference = asElement( args[ 0 ] );
+  reference.parentNode.insertBefore( element, reference.nextSibling );
+  return this;
+};
+
+var insertBefore_element = function( element, args ) {
+  var reference = asElement( args[ 0 ] );
+  reference.parentNode.insertBefore( element, reference );
   return this;
 };
 
@@ -405,5 +433,10 @@ var ensureWidgetElement = function( widget ) {
     widget._createElementImpl();
   }
 };
+
+var asElement = function( target ) {
+  return target instanceof $ ? target.get( 0 ) : target;
+};
+
 
 }());

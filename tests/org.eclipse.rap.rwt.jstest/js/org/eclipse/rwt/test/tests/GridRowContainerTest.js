@@ -98,10 +98,71 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       var tree = this._createDefaultTree();
       var sample = tree._rowContainer.$inner.prop( "childNodes" )[ 10 ];
       var bounds = getElementBounds( sample );
+      console.log( sample );
       assertEquals( 0, bounds.left );
       assertEquals( 200, bounds.top );
       assertEquals( 500, bounds.width );
       assertEquals( 20, bounds.height );
+      tree.destroy();
+    },
+
+    testRowOffsetsAfterOptimizedScrollingForward : function() {
+      var tree = this._createDefaultTree();
+      tree.setScrollBarsVisible( false, true );
+      tree.setItemCount( 100 );
+      var items = [];
+      for( var i = 0; i < 100; i++ ) {
+        items[ i ] = new rwt.widgets.GridItem( tree.getRootItem(), i );
+        items[ i ].setTexts( [ "Test" + i ] );
+      }
+      TestUtil.flush();
+
+      // use small offset and scrollbar directly to trigger optimized scrolling:
+      tree._vertScrollBar.setValue( 1 );
+      TestUtil.flush();
+
+      var container = tree.getRowContainer();
+      var rowCount = container.getRowCount();
+      var sampleTop = container._findRowByItem( items[ 1 ] ).$el.get( 0 );
+      var sampleMiddle = container._findRowByItem( items[ 6 ] ).$el.get( 0 );
+      var sampleBottom = container._findRowByItem( items[ rowCount ] ).$el.get( 0 );
+
+      assertEquals( 0, getElementBounds( sampleTop ).top );
+      assertContains( "Test1", sampleTop.innerHTML );
+      assertEquals( 100, getElementBounds( sampleMiddle ).top );
+      assertContains( "Test6", sampleMiddle.innerHTML );
+      assertEquals( 20 * ( rowCount - 1 ), getElementBounds( sampleBottom ).top );
+      assertContains( "Test" + rowCount, sampleBottom.innerHTML );
+      tree.destroy();
+    },
+
+    testRowOffsetsAfterOptimizedScrollingBackwards : function() {
+      var tree = this._createDefaultTree();
+      tree.setScrollBarsVisible( false, true );
+      tree.setItemCount( 100 );
+      var items = [];
+      for( var i = 0; i < 100; i++ ) {
+        items[ i ] = new rwt.widgets.GridItem( tree.getRootItem(), i );
+        items[ i ].setTexts( [ "Test" + i ] );
+      }
+      tree.setTopItemIndex( 2 );
+      TestUtil.flush();
+
+      tree._vertScrollBar.setValue( 1 );
+      TestUtil.flush();
+
+      var container = tree.getRowContainer();
+      var rowCount = container.getRowCount();
+      var sampleTop = container._findRowByItem( items[ 1 ] ).$el.get( 0 );
+      var sampleMiddle = container._findRowByItem( items[ 6 ] ).$el.get( 0 );
+      var sampleBottom = container._findRowByItem( items[ rowCount ] ).$el.get( 0 );
+
+      assertEquals( 0, getElementBounds( sampleTop ).top );
+      assertContains( "Test1", sampleTop.innerHTML );
+      assertEquals( 100, getElementBounds( sampleMiddle ).top );
+      assertContains( "Test6", sampleMiddle.innerHTML );
+      assertEquals( 20 * ( rowCount - 1 ), getElementBounds( sampleBottom ).top );
+      assertContains( "Test" + rowCount, sampleBottom.innerHTML );
       tree.destroy();
     },
 

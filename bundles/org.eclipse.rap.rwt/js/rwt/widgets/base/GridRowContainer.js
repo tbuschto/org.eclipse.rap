@@ -101,7 +101,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     // Public API
 
     setTopItem : function( item, index, render ) {
-      // TODO [tb] : write test for optimized render
       this._topItem = item;
       if( render ) {
         var delta = index - this._topItemIndex;
@@ -113,10 +112,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         } else {
           var numberOfShiftingRows = this.getRowCount() - delta;
           var updateFromRow = forwards ? numberOfShiftingRows : 0;
-          var newFirstRow = forwards ? delta : numberOfShiftingRows;
-          this._switchRows( newFirstRow );
+          var newFirstRow = this.getRow( forwards ? delta : numberOfShiftingRows );
+          this._sortRows( newFirstRow, forwards );
           this._updateRows( updateFromRow, delta, true );
-          this._renderBounds( true );
         }
       } else {
         this._topItemIndex = index;
@@ -386,9 +384,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       var to = from + delta;
       var rowIndex = 0;
       while( item != null && rowIndex < this.getRowCount() ) {
+        this._items[ rowIndex ] = item;
         if( rowIndex >= from && rowIndex <= to ) {
           this._renderRow( this.getRow( rowIndex ), item, contentOnly );
-          this._items[ rowIndex ] = item;
         }
         item = item.getNextItem();
         rowIndex++;
@@ -407,12 +405,15 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
                        contentOnly );
     },
 
-    _switchRows : function( newFirstRow ) {
-      var rowTemp = this._children.slice( newFirstRow );
-      var itemsTemp = this._items.slice( newFirstRow );
-      this._children = rowTemp.concat( this._children.slice( 0, newFirstRow ) );
-      this._items = itemsTemp.concat( this._items.slice( 0, newFirstRow ) );
-      this._invalidateVisibleChildren();
+    _sortRows : function( newFirstRow, forwards ) {
+      var lastRowIndex = this.getRowCount() - 1;
+      while( this.getRow( 0 ) !== newFirstRow ) {
+        if( forwards ) {
+          this.$inner.append( this.getRow( 0 ).$el );
+        } else {
+          this.$inner.prepend( this.getRow( lastRowIndex ).$el );
+        }
+      }
     },
 
     _renderBounds : function( renderLocation ) {

@@ -193,7 +193,7 @@ describe( "RWTQuery", function() {
 
       it( "uses widgetCssHooks to retrieve widget-properties indirectly", function() {
         var spy = jasmine.createSpy().andReturn( "red" );
-        $.widgetCssHooks[ "foo" ] = { "get" : spy }
+        $.widgetCssHooks[ "foo" ] = { "get" : spy };
 
         var result = $( widget ).css( "foo" );
 
@@ -286,7 +286,7 @@ describe( "RWTQuery", function() {
         expect( $( widget ).get( 1 ) ).toBeUndefined();
       } );
 
-    });
+    } );
 
     describe( "text", function() {
 
@@ -658,12 +658,23 @@ describe( "RWTQuery", function() {
 
     describe( "append", function() {
 
-      it( "appends an element", function() {
+      it( "appends an element as first/only", function() {
         var childElement = document.createElement( "div" );
 
         $( element ).append( childElement );
 
         expect( childElement.parentElement ).toBe( element );
+      } );
+
+      it( "appends an element as last", function() {
+        var firstChild = document.createElement( "div" );
+        element.appendChild( firstChild );
+        var childElement = document.createElement( "div" );
+
+        $( element ).append( childElement );
+
+        expect( childElement.parentElement ).toBe( element );
+        expect( childElement.previousElementSibling ).toBe( firstChild );
       } );
 
       it( "appends an RWTQuery instance", function() {
@@ -679,6 +690,37 @@ describe( "RWTQuery", function() {
         var $element = $( element );
 
         expect( $element.append( childElement ) ).toBe( $element );
+      } );
+
+    } );
+
+    describe( "prepend", function() {
+
+      it( "prepends an element as first/only", function() {
+        var childElement = document.createElement( "div" );
+
+        $( element ).prepend( childElement );
+
+        expect( childElement.parentElement ).toBe( element );
+      } );
+
+      it( "prepends an element as last", function() {
+        var firstChild = document.createElement( "div" );
+        element.appendChild( firstChild );
+        var childElement = document.createElement( "div" );
+
+        $( element ).prepend( childElement );
+
+        expect( childElement.parentElement ).toBe( element );
+        expect( childElement.nextElementSibling ).toBe( firstChild );
+      } );
+
+      it( "prepends an RWTQuery instance", function() {
+        var childElement = document.createElement( "div" );
+
+        $( element ).prepend( $( childElement ) );
+
+        expect( childElement.parentElement ).toBe( element );
       } );
 
     } );
@@ -719,6 +761,88 @@ describe( "RWTQuery", function() {
         var $childElement = $( childElement );
 
         expect( $childElement.detach() ).toBe( $childElement );
+      } );
+
+    } );
+
+    describe( "insertAfter", function() {
+
+      it( "inserts wrapped element after given element", function() {
+        var firstChild = document.createElement( "div" );
+        var lastChild = document.createElement( "div" );
+        $( element ).append( firstChild ).append( lastChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).insertAfter( firstChild );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousSibling ).toBe( firstChild );
+        expect( newElement.nextSibling ).toBe( lastChild );
+      } );
+
+      it( "inserts wrapped element after given wrapped element", function() {
+        var firstChild = document.createElement( "div" );
+        var lastChild = document.createElement( "div" );
+        $( element ).append( firstChild ).append( lastChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).insertAfter( $( firstChild ) );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousSibling ).toBe( firstChild );
+        expect( newElement.nextSibling ).toBe( lastChild );
+      } );
+
+      it( "inserts wrapped element as last element", function() {
+        var firstChild = document.createElement( "div" );
+        $( element ).append( firstChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).insertAfter( firstChild );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousElementSibling ).toBe( firstChild );
+      } );
+
+    } );
+
+    describe( "insertBefore", function() {
+
+      it( "inserts wrapped element before given element", function() {
+        var firstChild = document.createElement( "div" );
+        var lastChild = document.createElement( "div" );
+        $( element ).append( firstChild ).append( lastChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).insertBefore( lastChild );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousSibling ).toBe( firstChild );
+        expect( newElement.nextSibling ).toBe( lastChild );
+      } );
+
+      it( "inserts wrapped element before given wrapped element", function() {
+        var firstChild = document.createElement( "div" );
+        var lastChild = document.createElement( "div" );
+        $( element ).append( firstChild ).append( lastChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).insertBefore( $( lastChild ) );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousSibling ).toBe( firstChild );
+        expect( newElement.nextSibling ).toBe( lastChild );
+      } );
+
+      it( "inserts wrapped element as first element", function() {
+        var firstChild = document.createElement( "div" );
+        $( element ).append( firstChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).insertBefore( firstChild );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.nextElementSibling ).toBe( firstChild );
       } );
 
     } );

@@ -29,7 +29,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     this.$el = $( "<div>" ).css( {
       "overflow" : "hidden",
       "userSelect" : "none",
-      "height" : 16
+      "height" : 16,
+      "position" : "relative"
     });
     this.$el.prop( "row", this );
     this._styleMap = {};
@@ -323,6 +324,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
              || this._overlayStyleMap.backgroundGradient !== null;
     },
 
+    // TODO: broken on first render
     _renderIndention : function( item, config, hoverTarget ) {
       var expandSymbol = this._getExpandSymbol( item, config, hoverTarget );
       if( expandSymbol != null ) {
@@ -469,7 +471,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       Style.setBackgroundGradient( element, gradient );
     },
 
-    _layoutOverlay : function( item, config ) {
+    _layoutOverlay : function( item, config ) { // TODO: broken on first render
       var element = this._getOverlayElement();
       var height = this.getHeight();
       var left;

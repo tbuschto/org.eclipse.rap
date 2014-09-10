@@ -124,14 +124,6 @@ namespace( "rwt.client" );
       "autoHide" : false
     },
 
-    _checkConfig : {
-      "position" : "align-left",
-      "appearOn" : "enter",
-      "disappearOn" : "exit",
-      "appearDelay" : 200,
-      "disappearDelay" : 100
-    },
-
     _fieldConfig : {
       "position" : "align-left",
       "appearOn" : "rest",
