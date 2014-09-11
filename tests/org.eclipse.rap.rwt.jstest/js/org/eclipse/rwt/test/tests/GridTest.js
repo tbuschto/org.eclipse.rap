@@ -3477,7 +3477,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.flush();
       tree.setLinesVisible( true );
       TestUtil.flush();
-      assertEquals( 2, tree._rowContainer.$gridLines.prop( "childNodes" ).length - 1 );
+      assertEquals( 3, tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.destroy();
     },
 
@@ -3486,7 +3486,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setColumnCount( 3 );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var line = tree._rowContainer.$gridLines.prop( "childNodes" )[ 1 ];
+      var line = tree._rowContainer.$el.prop( "childNodes" )[ 2 ];
       assertEquals( 1, parseInt( line.style.zIndex, 10 ) );
       assertEquals( "0px", line.style.width );
       assertTrue( line.style.border !== "" || line.style.borderRight !== "" );
@@ -3498,10 +3498,10 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setLinesVisible( true );
       tree.setColumnCount( 1 );
       TestUtil.flush();
-      assertEquals( 1, tree._rowContainer.$gridLines.prop( "childNodes" ).length );
+      assertEquals( 1, tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      assertEquals( 3  , tree._rowContainer.$gridLines.prop( "childNodes" ).length );
+      assertEquals( 3  , tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.destroy();
     },
 
@@ -3510,10 +3510,10 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setLinesVisible( true );
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      assertEquals( 3, tree._rowContainer.$gridLines.prop( "childNodes" ).length );
+      assertEquals( 3, tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.setColumnCount( 1 );
       TestUtil.flush();
-      assertEquals( 1, tree._rowContainer.$gridLines.prop( "childNodes" ).length );
+      assertEquals( 1, tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.destroy();
     },
 
@@ -3522,10 +3522,10 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setLinesVisible( true );
       tree.setColumnCount( 3 );
       TestUtil.flush();
-      assertEquals( 3, tree._rowContainer.$gridLines.prop( "childNodes" ).length );
+      assertEquals( 3, tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.setLinesVisible( false );
       TestUtil.flush();
-      assertEquals( 0, tree._rowContainer.$gridLines.prop( "childNodes" ).length );
+      assertEquals( 0, tree._rowContainer.$el.prop( "childNodes" ).length - 1 );
       tree.destroy();
     },
 
@@ -3535,7 +3535,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setColumnCount( 3 );
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var line = tree._rowContainer.$gridLines.prop( "childNodes" )[ 0 ];
+      var line = tree._rowContainer.$el.prop( "childNodes" )[ 1 ];
       assertEquals( "0px", line.style.top );
       assertEquals( "500px", line.style.height );
       tree.setHeaderHeight( 20 );
@@ -3559,9 +3559,9 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setItemMetrics( 1, 205, 100, 0, 0, 0, 400 );
       tree.setItemMetrics( 2, 310, 50, 0, 0, 0, 400 );
       TestUtil.flush();
-      var line1 = tree._rowContainer.$gridLines.prop( "childNodes" )[ 0 ];
-      var line2 = tree._rowContainer.$gridLines.prop( "childNodes" )[ 1 ];
-      var line3 = tree._rowContainer.$gridLines.prop( "childNodes" )[ 2 ];
+      var line1 = tree._rowContainer.$el.prop( "childNodes" )[ 1 ];
+      var line2 = tree._rowContainer.$el.prop( "childNodes" )[ 2 ];
+      var line3 = tree._rowContainer.$el.prop( "childNodes" )[ 3 ];
       assertEquals( 201, parseInt( line1.style.left, 10 ) );
       assertEquals( 304, parseInt( line2.style.left, 10 ) );
       assertEquals( 359, parseInt( line3.style.left, 10 ) );

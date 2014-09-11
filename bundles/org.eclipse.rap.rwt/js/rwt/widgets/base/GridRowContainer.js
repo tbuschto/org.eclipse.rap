@@ -17,7 +17,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
   construct : function() {
     this.base( arguments );
     this.$rows = $( "<div>" ).css( fillLayout ).appendTo( this );
-    this.$gridLines = $( "<div>" ).css( fillLayout ).appendTo( this );
+    this.$el = $( this );
     this.setOverflow( "hidden" );
     this._scrollLeft = 0;
     this._rowHeight = 16;
@@ -143,7 +143,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     setRowWidth : function( width ) {
       this._rowWidth = width;
       this.$rows.css( "width", width );
-      this.$gridLines.css( "width", width );
       this._forEachRow(function(row){
         row.setWidth( width );
       });
@@ -282,7 +281,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         line.style.width = "0px";
         this._getVerticalGridBorder().renderElement( line );
         // Important: add to outer element to keep the row-to-children mapping intact
-        this.$gridLines.append( line );
+        this.$el.append( line );
         this._vertGridLines[ column ] = line;
       }
       return this._vertGridLines[ column ];

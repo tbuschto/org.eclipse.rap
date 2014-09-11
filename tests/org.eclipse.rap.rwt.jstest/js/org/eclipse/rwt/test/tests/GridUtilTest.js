@@ -455,15 +455,15 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridUtilTest", {
       var tree = this._createSplitTree();
       tree.setLinesVisible( true );
       TestUtil.flush();
-      var cont1 = tree.getRowContainer().getSubContainer( 0 ).$gridLines.get( 0 );
-      var cont2 = tree.getRowContainer().getSubContainer( 1 ).$gridLines.get( 0 )
-      assertEquals( 2, cont1.childNodes.length );
-      assertEquals( 3, cont2.childNodes.length );
-      assertEquals( 49, parseInt( cont1.childNodes[ 0 ].style.left, 10 ) );
-      assertEquals( 21, parseInt( cont1.childNodes[ 1 ].style.left, 10 )  );
-      assertEquals( 20, parseInt( cont2.childNodes[ 0 ].style.left, 10 )  );
-      assertEquals( 52, parseInt( cont2.childNodes[ 1 ].style.left, 10 )  );
+      var cont1 = tree.getRowContainer().getSubContainer( 0 ).$el.get( 0 );
+      var cont2 = tree.getRowContainer().getSubContainer( 1 ).$el.get( 0 )
+      assertEquals( 3, cont1.childNodes.length );
+      assertEquals( 4, cont2.childNodes.length );
+      assertEquals( 49, parseInt( cont1.childNodes[ 1 ].style.left, 10 ) );
+      assertEquals( 21, parseInt( cont1.childNodes[ 2 ].style.left, 10 )  );
+      assertEquals( 20, parseInt( cont2.childNodes[ 1 ].style.left, 10 )  );
       assertEquals( 52, parseInt( cont2.childNodes[ 2 ].style.left, 10 )  );
+      assertEquals( 52, parseInt( cont2.childNodes[ 3 ].style.left, 10 )  );
       tree.destroy();
     },
 
@@ -471,14 +471,14 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridUtilTest", {
       var TestUtil = org.eclipse.rwt.test.fixture.TestUtil;
       var tree = this._createSplitTree();
       TestUtil.flush();
-      var cont1 = tree.getRowContainer().getSubContainer( 0 ).$gridLines.get( 0 );
-      var cont2 = tree.getRowContainer().getSubContainer( 1 ).$gridLines.get( 0 );
+      var cont1 = tree.getRowContainer().getSubContainer( 0 ).$el.get( 0 );
+      var cont2 = tree.getRowContainer().getSubContainer( 1 ).$el.get( 0 );
       tree.setLinesVisible( true );
       TestUtil.flush();
       rwt.widgets.util.GridUtil.setFixedColumns( tree, 0 );
       TestUtil.flush();
-      assertEquals( 0, cont1.childNodes.length );
-      assertEquals( 5, cont2.childNodes.length );
+      assertEquals( 1, cont1.childNodes.length );
+      assertEquals( 6, cont2.childNodes.length );
       tree.destroy();
     },
 
