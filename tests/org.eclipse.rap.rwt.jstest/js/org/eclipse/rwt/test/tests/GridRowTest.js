@@ -669,12 +669,12 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
       item.setTexts( [ "Test" ] );
       row.renderItem( item, tree._config, false, null );
       var nodes = row.$el.get( 0 ).childNodes;
-      assertEquals( 0, TestUtil.getElementBounds( nodes[ 2 ] ).top );
-      assertEquals( 0, TestUtil.getElementBounds( nodes[ 1 ] ).top );
-      assertEquals( 0, TestUtil.getElementBounds( nodes[ 0 ] ).top );
-      assertEquals( 0, TestUtil.getElementBounds( nodes[ 2 ] ).left );
-      assertEquals( 32, TestUtil.getElementBounds( nodes[ 1 ] ).left );
-      assertEquals( 48, TestUtil.getElementBounds( nodes[ 0 ] ).left );
+      assertEquals( 0, nodes[ 2 ].offsetTop );
+      assertEquals( 0, nodes[ 1 ].offsetTop );
+      assertEquals( 0, nodes[ 0 ].offsetTop );
+      assertEquals( 0, nodes[ 2 ].offsetLeft );
+      assertEquals( 32, nodes[ 1 ].offsetLeft );
+      assertEquals( 48, nodes[ 0 ].offsetLeft );
     },
 
     testIndentSymbolsNotEnoughSpace : function() {
@@ -705,12 +705,12 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
       item.setTexts( [ "Test" ] );
       row.renderItem( item, tree._config, false, null );
       var nodes = row.$el.get( 0 ).childNodes;
-      assertEquals( 16, TestUtil.getElementBounds( nodes[ 2 ] ).width );
-      assertEquals( 16, TestUtil.getElementBounds( nodes[ 1 ] ).width );
-      assertEquals( 16, TestUtil.getElementBounds( nodes[ 0 ] ).width );
-      assertEquals( 15, TestUtil.getElementBounds( nodes[ 2 ] ).height );
-      assertEquals( 15, TestUtil.getElementBounds( nodes[ 1 ] ).height );
-      assertEquals( 15, TestUtil.getElementBounds( nodes[ 0 ] ).height );
+      assertEquals( 16, nodes[ 2 ].offsetWidth );
+      assertEquals( 16, nodes[ 1 ].offsetWidth );
+      assertEquals( 16, nodes[ 0 ].offsetWidth );
+      assertEquals( 15, nodes[ 2 ].offsetHeight );
+      assertEquals( 15, nodes[ 1 ].offsetHeight );
+      assertEquals( 15, nodes[ 0 ].offsetHeight );
     },
 
     testIndentSymbolFirstItemOfLayer : function() {
@@ -2088,11 +2088,11 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
       row.renderItem( item, tree._config, true, null );
 
-      var bounds = TestUtil.getElementBounds( this._getOverlayElement( row ) );
-      assertEquals( 0, bounds.left );
-      assertEquals( 0, bounds.top );
-      assertEquals( row.getHeight(), bounds.height );
-      assertEquals( row.getWidth(), bounds.width );
+      var el = this._getOverlayElement( row );
+      assertEquals( 0, el.offsetLeft );
+      assertEquals( 0, el.offsetTop );
+      assertEquals( row.getHeight(), el.offsetHeight );
+      assertEquals( row.getWidth(), el.offsetWidth );
     },
 
     testRenderThemingItemForeground : function() {

@@ -382,11 +382,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       var cellWidth = config.itemWidth[ config.treeColumn ];
       if( nextLevelOffset <= cellWidth || config.rowTemplate ) {
         var offset = level * config.indentionWidth;
-        var height = this.getHeight();
         var width = nextLevelOffset - offset;
         var element = this._getMiscImage();
         this._setImage( element, source, config.enabled );
-        this._setBounds( element, offset, 0, width, height );
+        element.css( { "left" : offset, "top" : 0, "width" : width, "height" : "100%" } );
         result = element;
       }
       return result;
@@ -464,25 +463,19 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     },
 
     _layoutOverlay : function( item, config ) { // TODO: broken on first render
-      var element = this._getOverlayElement();
-      var height = this.getHeight();
-      var left;
-      var width;
-      if( config.fullSelection ) {
-        left = 0;
-        width = this.getWidth();
-      } else {
+      if( !config.fullSelection ) {
+        var element = this._getOverlayElement();
         var cell = config.treeColumn;
         var padding = config.selectionPadding;
-        left = this._getItemTextLeft( item, cell, config );
+        var left = this._getItemTextLeft( item, cell, config );
         left -= padding[ 0 ];
-        width = this._getItemTextWidth( item, cell, config );
+        var width = this._getItemTextWidth( item, cell, config );
         width += width > 0 ? padding[ 0 ] : 0;
         var visualWidth  = this._getVisualTextWidth( item, cell, config );
         visualWidth  += padding[ 0 ] + padding[ 1 ];
         width = Math.min( width, visualWidth );
+        element.css( { "left" : left, "width" : width } );
       }
-      this._setBounds( element, left, 0, width, height );
     },
 
     _renderCellBackground : function( item, cell, config, contentOnly ) {
@@ -506,7 +499,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       if( element ) {
         var left = this._getItemLeft( item, cell, config );
         var width = this._getItemWidth( item, cell, config );
-        var height = this.getHeight();
+        var height = this.getHeight(); // TODO: get rid of all getHeight uses, replace with 100%
         if( this.hasState( "linesvisible" ) ) {
           height -= 1;
         }
@@ -855,8 +848,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
     _getOverlayElement : function() {
       if( this._overlayElement === null ) {
         this._overlayElement = this._createElement( 2 );
+        this._overlayElement.css( { "width" : "100%", "height" : "100%" } );
       }
-      return this._overlayElement.css( "display", "" );
+      return this._overlayElement.css( { "display" : "" } );
     },
 
     _getBackgroundElement : function( cell ) {
