@@ -2601,6 +2601,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
     },
 
     testRenderTemplate_CallRender : function() {
+      tree.addToDocument();
+      TestUtil.flush(); // ensure Tree is seeable to make renderConfig.seeable true
       tree.setTreeColumn( -1 );
       var item = this._createItem( tree );
       row.setHeight( 15 );
@@ -2625,7 +2627,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
       assertIdentical( row.$el.get( 0 ), log[ 0 ][ 0 ].container.element );
       assertIdentical( template, log[ 0 ][ 0 ].container.template );
       assertEquals( 100, log[ 0 ][ 0 ].container.zIndexOffset );
-      assertEquals( row.isSeeable(), log[ 0 ][ 0 ].seeable );
+      assertTrue( log[ 0 ][ 0 ].seeable );
     },
 
     testRenderTemplate_CallRenderWithIndention : function() {

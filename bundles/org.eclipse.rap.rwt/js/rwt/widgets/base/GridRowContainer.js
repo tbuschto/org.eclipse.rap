@@ -62,6 +62,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         "textColor" : null,
         "font" : null,
         "enabled" : true,
+        "seeable" : false,
         "focused" : false,
         "linesVisible" : false,
         "fullSelection" : false,

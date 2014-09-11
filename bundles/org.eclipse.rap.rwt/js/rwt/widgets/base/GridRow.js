@@ -173,12 +173,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       return parseInt( this.$el.css( "height" ) || "0" );
     },
 
-    isSeeable : function() {
-      // TODO [tb] : Only works in FF 9 or higher. Either raise requirements or create polyfill
-      // TODO [tb] : use renderConfig instead
-      return document.body.contains( this.$el.get( 0 ) );
-    },
-
     ////////////
     // internals
 
@@ -196,7 +190,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       renderer.targetBounds = [ xOffset, 0, this.getWidth() - xOffset, this.getHeight() ];
       renderer.markupEnabled = config.markupEnabled;
       renderer.targetIsEnabled = config.enabled;
-      renderer.targetIsSeeable = this.isSeeable();
+      renderer.targetIsSeeable = config.seeable;
       renderer.renderItem( item );
     },
 
@@ -586,7 +580,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       if( item.hasText( cell ) ) {
         renderBounds = isTreeColumn || !contentOnly || !this._cellLabels[ cell ];
         element = this._getTextElement( cell );
-        this._renderElementContent( element, item, cell, config.markupEnabled );
+        this._renderElementContent( element, item, cell, config );
         if( renderBounds ) {
           element.css( "textAlign", isTreeColumn ? "left" : this._getAlignment( cell, config ) );
         }
@@ -594,7 +588,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       } else if( this._cellLabels[ cell ] ) {
         renderBounds = isTreeColumn || !contentOnly;
         element = this._getTextElement( cell );
-        this._renderElementContent( element, null, -1, config.markupEnabled );
+        this._renderElementContent( element, null, -1, config );
       }
       if( renderBounds ) {
         this._renderCellLabelBounds( item, cell, config );
@@ -614,10 +608,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       }
     },
 
-    _renderElementContent : function( element, item, cell, markupEnabled ) {
+    _renderElementContent : function( element, item, cell, config ) {
       var options = {
-        "markupEnabled" : markupEnabled,
-        "seeable" : this.isSeeable(),
+        "markupEnabled" : config.markupEnabled,
+        "seeable" : config.seeable,
         "removeNewLines" : true
       };
       cellRenderer.text.renderContent( element.get( 0 ),
@@ -914,7 +908,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       }
       for( var i = 0; i < this._cellLabels.length; i++ ) {
         if( this._cellLabels[ i ] ) {
-          this._renderElementContent( this._cellLabels[ i ], null, -1, config.markupEnabled );
+          this._renderElementContent( this._cellLabels[ i ], null, -1, config );
         }
       }
       if( this._checkBoxElement ) {

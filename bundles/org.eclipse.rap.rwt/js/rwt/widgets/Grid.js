@@ -129,6 +129,8 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
       this._horzScrollBar.addEventListener( "changeValue", this._onHorzScrollBarChangeValue, this );
       this._vertScrollBar.addEventListener( "changeValue", this._onVertScrollBarChangeValue, this );
       this._rowContainer.setSelectionProvider( this.isItemSelected, this );
+      this._rowContainer.addEventListener( "appear", this._onChangeSeeable );
+      this._rowContainer.addEventListener( "disappear", this._onChangeSeeable );
     },
 
     _parseArgsMap : function( map ) {
@@ -461,6 +463,10 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
     _beforeAppear : function() {
       this.base( arguments );
       this._scheduleColumnUpdate();
+    },
+
+    _onChangeSeeable : function() {
+      this._config.seeable = this.isSeeable();
     },
 
     _scheduleColumnUpdate : function() {
