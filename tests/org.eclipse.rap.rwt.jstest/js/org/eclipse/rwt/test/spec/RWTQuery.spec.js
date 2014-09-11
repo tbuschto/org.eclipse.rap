@@ -904,17 +904,46 @@ describe( "RWTQuery", function() {
         expect( element.textContent ).toBe( "foo  bar" );
       } );
 
-
       it( "gets textContent", function() {
         element.textContent = "foo  bar";
 
-        expect( $( element).text() ).toBe( "foo  bar" );
+        expect( $( element ).text() ).toBe( "foo  bar" );
       } );
 
       it( "isChainable", function() {
         var $element = $( element );
 
         expect( $element.text( "foo" ) ).toBe( $element );
+      } );
+
+    } );
+
+    describe( "html", function() {
+
+      it( "sets innerHTML", function() {
+        $( element ).html( "<div></div><span></span>" );
+
+        expect( element.innerHTML ).toBe( "<div></div><span></span>" );
+      } );
+
+      it( "gets innerHTML", function() {
+        element.innerHTML = "<div></div><span></span>";
+
+        expect( $( element ).html() ).toBe( "<div></div><span></span>" );
+      } );
+
+    } );
+
+    describe( "is", function() {
+
+      it( "compares with element", function() {
+        expect( $( element ).is( element ) ).toBeTruthy();
+        expect( $( element ).is( document.body ) ).toBeFalsy();
+      } );
+
+      it( "compares with wrapped element", function() {
+        expect( $( element ).is( $( element ) ) ).toBeTruthy();
+        expect( $( element ).is( $( document.body ) ) ).toBeFalsy();
       } );
 
     } );

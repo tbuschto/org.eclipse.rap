@@ -110,8 +110,16 @@ rwt.util._RWTQuery.prototype = $.prototype = {
     return this.__access( arguments, "_getTargetNode", text_element );
   },
 
+  html : function() {
+    return this.__access( arguments, "_getTargetNode", html_element );
+  },
+
   "get" : function() {
     return this.__access( arguments, "getElement", get_element );
+  },
+
+  is : function() {
+    return this.__access( arguments, null, is_element );
   }
 
 };
@@ -145,12 +153,46 @@ $.cssHooks = {
       return rwt.html.Style.getBackgroundImage( element );
     }
   },
+  "backgroundRepeat" : {
+    "set" : function( element, value ) {
+      rwt.html.Style.setBackgroundRepeat( element, value );
+    },
+    "get" : function( element ) {
+      return rwt.html.Style.getBackgroundRepeat( element );
+    }
+  },
+  "backgroundPosition" : {
+    "set" : function( element, value ) {
+      rwt.html.Style.setBackgroundPosition( element, value );
+    },
+    "get" : function( element ) {
+      return rwt.html.Style.getBackgroundPosition( element );
+    }
+  },
   "backgroundGradient" : {
     "set" : function( element, value ) {
       rwt.html.Style.setBackgroundGradient( element, fixBackgroundGradient( value ) );
     },
     "get" : function( element ) {
       return rwt.html.Style.getBackgroundGradient( element );
+    }
+  },
+  "textShadow" : {
+    "set" : function( element, value ) {
+      if( value instanceof Array ) {
+        rwt.html.Style.setTextShadow( element, value );
+      } else {
+        element.style.textShadow = value;
+      }
+    }
+  },
+  "boxShadow" : {
+    "set" : function( element, value ) {
+      if( value instanceof Array ) {
+        rwt.html.Style.setBoxShadow( element, value );
+      } else {
+        element.style.boxShadow = value;
+      }
     }
   },
   "border" : {
@@ -170,7 +212,7 @@ $.cssHooks = {
         element.style.font = value;
       }
     }
-  }
+  },
 };
 
 // NOTE: this list is still incomplete, extend as needed
@@ -178,6 +220,8 @@ $.widgetCssHooks = {
   "font": "font",
   "border": "border",
   "backgroundColor": "backgroundColor",
+  "textShadow": "textShadow",
+  "boxShadow": "shadow",
   "color": "textColor",
   "left": "left",
   "top": "top",
@@ -358,11 +402,23 @@ var get_element = function( element, args ) {
   return args.length > 0 ? result[ args[ 0 ] ] : result;
 };
 
+var is_element = function( element, args ) {
+  return element === asElement( args[ 0 ] );
+};
+
 var text_element = function( element, args ) {
   if( args.length === 0 )  {
     return element.textContent;
   }
   element.textContent = args[ 0 ];
+  return this;
+};
+
+var html_element = function( element, args ) {
+  if( args.length === 0 )  {
+    return element.innerHTML;
+  }
+  element.innerHTML = args[ 0 ];
   return this;
 };
 

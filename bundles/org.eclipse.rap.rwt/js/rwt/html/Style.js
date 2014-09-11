@@ -336,6 +336,10 @@ rwt.qx.Class.define( "rwt.html.Style", {
       }
     },
 
+    getBackgroundRepeat : function( target ) {
+      return target.___rwtStyle__backgroundRepeat;
+    },
+
     setBackgroundPosition : function( target, position ) {
       if( target.___rwtStyle__backgroundPosition !== position ) {
         target.___rwtStyle__backgroundPosition = position;
@@ -343,6 +347,10 @@ rwt.qx.Class.define( "rwt.html.Style", {
           this._updateBackground( target );
         }
       }
+    },
+
+    getBackgroundPosition : function( target ) {
+      return target.___rwtStyle__backgroundPosition;
     },
 
     setBackgroundSize : function( target, size ) {

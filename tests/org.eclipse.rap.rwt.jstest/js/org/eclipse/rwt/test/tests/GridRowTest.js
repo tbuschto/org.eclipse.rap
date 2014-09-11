@@ -1765,7 +1765,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
       assertEquals( "transparent", row.$el.css( "backgroundColor" ) );
       assertEquals( 4, row.$el.get( 0 ).childNodes.length );
-      var selNode = row._overlayElement;
+      var selNode = row._overlayElement.get( 0 );
       assertEquals( "", selNode.innerHTML );
       var width = parseInt( selNode.style.width, 10 );
       assertEquals( "green", selNode.style.backgroundColor );
@@ -1784,7 +1784,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
       row.renderItem( item, tree._config, true, null );
 
-      var selNode = row._overlayElement;
+      var selNode = row._overlayElement.get( 0 );
       assertEquals( "", selNode.innerHTML );
       var width = parseInt( selNode.style.width, 10 );
       assertEquals( "green", selNode.style.backgroundColor );
@@ -1804,7 +1804,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
       row.renderItem( item, tree._config, true, null );
 
-      var selNode = row._overlayElement;
+      var selNode = row._overlayElement.get( 0 );
       var width = parseInt( selNode.style.width, 10 );
       assertEquals( "green", selNode.style.backgroundColor );
       // Since we dont know the scrollwidth of the node, this is a bit fuzzy:
@@ -1961,7 +1961,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
         row.renderItem( item, tree._config, false, null );
 
-        var gradient = TestUtil.getCssGradient( row._overlayElement );
+        var gradient = TestUtil.getCssGradient( row._overlayElement.get( 0 ) );
         assertTrue( gradient.indexOf( "red" ) !== -1 );
         assertTrue( gradient.indexOf( "yellow" ) !== -1 );
       }
@@ -2772,7 +2772,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
 
       row.renderItem( item, tree._config, false, null );
 
-      assertEquals( "green", row._overlayElement.style.backgroundColor );
+      assertEquals( "green", row._overlayElement.get( 0 ).style.backgroundColor );
     },
 
     testRenderTemplate_RenderTextCellLeft : function() {
@@ -3254,7 +3254,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
     },
 
     _getOverlayElement : function( row ) {
-      return row._overlayElement;
+      return row._overlayElement.get( 0 );
     }
 
   }
