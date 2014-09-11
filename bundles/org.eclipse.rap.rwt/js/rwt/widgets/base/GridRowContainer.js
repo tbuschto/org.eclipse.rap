@@ -16,13 +16,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
   construct : function() {
     this.base( arguments );
-    // Don't use $ to wrap widget, we need to be able to address inner and outer element separately
-    // TODO: this is sort of abusing the enhancedBorder feature. $inner should be created explicitly
-    this.enableEnhancedBorder();
-    this.$outer = $( $( this ).get( 0 ) ); // also forces widget creation, enables next line:
-    this.$inner = new rwt.util._RWTQuery( this._getTargetNode() );
+    this.$rows = $( "<div>" ).css( fillLayout ).appendTo( this );
+    this.$gridLines = $( "<div>" ).css( fillLayout ).appendTo( this );
     this.setOverflow( "hidden" );
-    this.$outer.css( "overflow", "hidden" );
     this._scrollLeft = 0;
     this._rowHeight = 16;
     this._rowWidth = 0;
@@ -145,6 +141,8 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     setRowWidth : function( width ) {
       this._rowWidth = width;
+      this.$rows.css( "width", width );
+      this.$gridLines.css( "width", width );
       this._forEachRow(function(row){
         row.setWidth( width );
       });
@@ -183,11 +181,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     getRowCount : function() {
-      return this.$inner.prop( "childElementCount" );
+      return this.$rows.prop( "childElementCount" );
     },
 
     getRow : function( index ) {
-      return this.$inner.prop( "children" )[ index ][ "row" ];
+      return this.$rows.prop( "children" )[ index ][ "row" ];
     },
 
     findRowByElement : function( target ) {
@@ -283,7 +281,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         line.style.width = "0px";
         this._getVerticalGridBorder().renderElement( line );
         // Important: add to outer element to keep the row-to-children mapping intact
-        this.$outer.append( line );
+        this.$gridLines.append( line );
         this._vertGridLines[ column ] = line;
       }
       return this._vertGridLines[ column ];
@@ -291,7 +289,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _removeGridLine : function( column ) {
       if( this._vertGridLines[ column ] ) {
-        this.getElement().removeChild( this._vertGridLines[ column ] );
+        $( this._vertGridLines[ column ] ).detach();
         delete this._vertGridLines[ column ];
       }
     },
@@ -358,7 +356,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
           "border": this._rowBorder
         } );
         row.setState( "linesvisible", this._config.linesVisible );
-        this.$inner.append( row.$el );
+        this.$rows.append( row.$el );
       }
       while( this.getRowCount() > rowsNeeded ) {
         this.getRow( this.getRowCount() - 1 ).dispose();
@@ -409,9 +407,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       var lastRowIndex = this.getRowCount() - 1;
       while( this.getRow( 0 ) !== newFirstRow ) {
         if( forwards ) {
-          this.$inner.append( this.getRow( 0 ).$el );
+          this.$rows.append( this.getRow( 0 ).$el );
         } else {
-          this.$inner.prepend( this.getRow( lastRowIndex ).$el );
+          this.$rows.prepend( this.getRow( lastRowIndex ).$el );
         }
       }
     },
@@ -506,5 +504,12 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
   }
 } );
+
+var fillLayout = {
+  "position" : "absolute",
+  "left" : 0,
+  "top" : 0,
+  "height" : "100%"
+};
 
 }( rwt.util._RWTQuery ));

@@ -40,14 +40,12 @@ rwt.util._RWTQuery.prototype = $.prototype = {
     if( typeof target === "string" ) {
       target = parseHTML( target );
     }
-    var isWidget = ( target.classname || "" ).indexOf( "rwt.widgets" ) === 0;
     this.__access = function( args, callbackWidget, callbackElement ) {
-      if( isWidget ) {
+      if( isWidget( target ) ) {
         if( typeof callbackWidget === "function" ) {
           return callbackWidget.apply( this, [ target, args, privileged ] );
         } else if( typeof callbackWidget === "string" ) {
-          ensureWidgetElement( target );
-          var element = target[ callbackWidget ]();
+          var element = asElement( target, callbackWidget );
           return callbackElement.apply( this, [ element, args, privileged ] );
         }
       }
@@ -90,6 +88,10 @@ rwt.util._RWTQuery.prototype = $.prototype = {
 
   detach : function() {
     return this.__access( arguments, null, detach_element );
+  },
+
+  appendTo : function() {
+    return this.__access( arguments, null, appendTo_element );
   },
 
   insertAfter : function() {
@@ -341,6 +343,11 @@ var insertBefore_element = function( element, args ) {
   return this;
 };
 
+var appendTo_element = function( element, args ) {
+  asElement( args[ 0 ], "_getTargetNode" ).appendChild( element );
+  return this;
+};
+
 var detach_element = function( element ) {
   element.parentNode.removeChild( element );
   return this;
@@ -434,9 +441,15 @@ var ensureWidgetElement = function( widget ) {
   }
 };
 
-var asElement = function( target ) {
+var asElement = function( target, widgetElementGetter ) {
+  if( isWidget( target ) ) {
+    ensureWidgetElement( target );
+    return target[ ( widgetElementGetter || "getElement" ) ]();
+  }
   return target instanceof $ ? target.get( 0 ) : target;
 };
 
-
+var isWidget = function( target ) {
+  return ( target.classname || "" ).indexOf( "rwt.widgets" ) === 0;
+}
 }());

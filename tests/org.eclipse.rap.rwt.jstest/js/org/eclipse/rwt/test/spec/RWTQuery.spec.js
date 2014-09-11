@@ -765,6 +765,55 @@ describe( "RWTQuery", function() {
 
     } );
 
+    describe( "appendTo", function() {
+
+      it( "appends wrapped element as last element", function() {
+        var firstChild = document.createElement( "div" );
+        var lastChild = document.createElement( "div" );
+        $( element ).append( firstChild ).append( lastChild );
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).appendTo( element );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousSibling ).toBe( lastChild );
+      } );
+
+      it( "appends wrapped element to wrapped element", function() {
+        var firstChild = document.createElement( "div" );
+        var lastChild = document.createElement( "div" );
+        $( element ).append( firstChild ).append( lastChild );
+        var newElement = document.createElement( "div" );
+        $( newElement ).appendTo( $( element ) );
+
+        expect( newElement.parentElement ).toBe( element );
+        expect( newElement.previousSibling ).toBe( lastChild );
+      } );
+
+      it( "appends wrapped element to widget", function() {
+        var targetNode = null, widgetNode = null;
+        var widget = {};
+        widget.classname = "rwt.widgets.Foo";
+        widget._createElementImpl = function() {
+          targetNode = element;
+          widgetNode = document.createElement( "div" );
+        };
+        widget._getTargetNode = function() {
+          return targetNode;
+        };
+        widget.getElement = function() {
+          return widgetNode;
+        };
+        var newElement = document.createElement( "div" );
+
+        $( newElement ).appendTo( widget );
+
+        expect( newElement.parentElement ).toBe( element );
+      } );
+
+
+    } );
+
     describe( "insertAfter", function() {
 
       it( "inserts wrapped element after given element", function() {

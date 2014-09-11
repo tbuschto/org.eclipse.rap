@@ -96,9 +96,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
     testTreeRowBounds : function() {
       var tree = this._createDefaultTree();
-      var sample = tree._rowContainer.$inner.prop( "childNodes" )[ 10 ];
+      var sample = tree._rowContainer.$rows.prop( "childNodes" )[ 10 ];
       var bounds = getElementBounds( sample );
-      console.log( sample );
       assertEquals( 0, bounds.left );
       assertEquals( 200, bounds.top );
       assertEquals( 500, bounds.width );
@@ -238,7 +237,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
     testChangeTreeRowBounds : function() {
       var tree = this._createDefaultTree();
-      var sample = tree._rowContainer.$inner.prop( "childNodes" )[ 10 ];
+      var sample = tree._rowContainer.$rows.prop( "childNodes" )[ 10 ];
       tree.setWidth( 400 );
       tree.setItemHeight( 15 );
       TestUtil.flush();
