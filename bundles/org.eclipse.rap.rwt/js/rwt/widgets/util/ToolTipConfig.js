@@ -41,7 +41,7 @@ namespace( "rwt.client" );
         case "rwt.widgets.Scale":
         case "rwt.widgets.Slider":
           return rwt.util.Objects.mergeWith( { "overlap" : -2 }, this._getBarConfig( widget ) );
-        case "rwt.widgets.base.GridRow":
+        case "rwt.widgets.base.GridRowContainer":
           return this._rowConfig;
         default:
           return this._defaultConfig;

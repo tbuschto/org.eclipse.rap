@@ -92,7 +92,6 @@ rwt.qx.Class.define( "rwt.widgets.util.ToolTipManager", {
       this.setCurrentToolTipTarget( vTarget );
     },
 
-
     _handleMouseOut : function( e ) {
       var vTarget = e.getTarget();
       var vRelatedTarget = e.getRelatedTarget();

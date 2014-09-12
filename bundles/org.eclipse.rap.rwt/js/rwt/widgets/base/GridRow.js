@@ -139,14 +139,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
       this.setState( "even", index % 2 === 0 );
     },
 
-    requestToolTipText : function() {
-      this.dispatchSimpleEvent( "renderCellToolTip", this, true );
-    },
-
-    getToolTipTargetBounds : function() {
-      return rwt.widgets.util.GridCellToolTipSupport.getCurrentToolTipTargetBounds( this );
-    },
-
     setAppearance : function( appearance ) {
       this._appearance = appearance;
     },
@@ -161,6 +153,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
     setHeight : function( height ) {
       this.$el.css( "height", height );
+    },
+
+    getTop : function() {
+      return this.$el.get( 0 ).offsetTop;
     },
 
     getWidth : function() {

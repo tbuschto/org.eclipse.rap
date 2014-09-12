@@ -258,18 +258,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
       assertEquals( 45, node.childNodes[ 1 ].offsetWidth );
     },
 
-      // TODO: cellToolTipSupport must be reworked anyway
-//    testRequestToolTipText_DispatchesBubblingEvent : function() {
-//      var data;
-//      row.getParent().addEventListener( "renderCellToolTip", function( value ) {
-//        data = value;
-//      } );
-//
-//      row.requestToolTipText();
-//
-//      assertIdentical( row, data );
-//    },
-
     testLabelBoundsTable : function() {
       tree.setTreeColumn( -1 );
       var item = this._createItem( tree );
@@ -825,29 +813,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
       var node = row.$el.get( 0 ).childNodes[ 1 ];
       assertEquals( "red", node.style.color );
     },
-//TODO: should no longer be relevant
-//    testRenderItemForeground_withEnhancedBorder : function() {
-//      TestUtil.fakeAppearance( "tree-row", {
-//        "style" : function( states ) {
-//          return {
-//            backgroundGradient : null,
-//            backgroundImage : null,
-//            background : "blue",
-//            foreground : "red"
-//          };
-//        }
-//      } );
-//      row.setAppearance( "tree-row" );
-//      row.prepareEnhancedBorder();
-//      var item = this._createItem( tree );
-//      item.setTexts( [ "Test" ] );
-//
-//      row.renderItem( item, tree._config, false, null );
-//
-//      var node = row.$el.get( 0 ).childNodes[ 1 ];
-//      assertEquals( "red", row.$el.get( 0 ).style.color );
-//      assertTrue( "inherit" === node.style.color || "" === node.style.color );
-//    },
 
     testRenderItemForeground_disabled : function() {
       tree.setEnabled( false );
@@ -1618,7 +1583,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowTest", {
     testIsCheckBoxClick : function() {
       this._createTree( false, "check" );
       this._setCheckBox( "mycheckbox.gif" );
-      var log = [];
       var item = this._createItem( tree );
       item.setTexts( [ "Test" ] );
       row.renderItem( item, tree._config, false, null );

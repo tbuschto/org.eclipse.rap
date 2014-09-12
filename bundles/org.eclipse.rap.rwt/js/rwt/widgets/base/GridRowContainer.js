@@ -157,18 +157,24 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     },
 
     setCellToolTipsEnabled : function( value ) {
-//      this._cellToolTipsEnabled = value;
-//      for( var i = 0; i < this.getRowCount(); i++ ) {
-//        if( value ) {
-//          this.getRow( i ).setToolTipText( "" );
-//        } else {
-//          this.getRow( i ).resetToolTipText();
-//        }
-//      }
+      this._cellToolTipsEnabled = value;
+      if( value ) {
+        this.setToolTipText( "" );
+      } else {
+        this.resetToolTipText();
+      }
     },
 
     getCellToolTipsEnabled : function() {
       return this._cellToolTipsEnabled;
+    },
+
+    requestToolTipText : function() {
+      this.dispatchSimpleEvent( "renderCellToolTip", this._hoverRow, true );
+    },
+
+    getToolTipTargetBounds : function() {
+      return rwt.widgets.util.GridCellToolTipSupport.getCurrentToolTipTargetBounds( this._hoverRow );
     },
 
     updateRowLines : function() {
@@ -240,12 +246,12 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       return this._hoverItem;
     },
 
-    setHoverItem : function( item ) {
-      if( item ) {
-        this._hoverTargetType = [ "other" ];
-      }
-      this._setHoverItem( item );
-    },
+//    setHoverItem : function( item ) {
+//      if( item ) {
+//        this._hoverTargetType = [ "other" ];
+//      }
+//      this._setHoverItem( item );
+//    },
 
     ///////////
     // Internal
@@ -346,9 +352,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       while( this.getRowCount() < rowsNeeded ) {
         var row = new rwt.widgets.base.GridRow( this.getParent() );
         row.setAppearance( this._getRowAppearance() );
-        if( this._cellToolTipsEnabled ) {
-          row.setToolTipText( "" );
-        }
         row.$el.css( {
           "zIndex": 0,
           "width": this._rowWidth,
@@ -432,7 +435,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         var targetTypes = row.identify( target );
         if( item !== this._hoverItem || this._hoverTargetType[ 0 ] !== targetTypes[ 0 ] ) {
           this._hoverTargetType = targetTypes;
-          this._setHoverItem( item );
+          this._setHoverItem( item, row );
         }
       }
     },
@@ -442,14 +445,16 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       var related = rwt.event.EventHandlerUtil.getRelatedTargetObjectFromEvent( target );
       if( !this.findRowByElement( related ) ) {
         this._hoverTargetType = [];
-        this._setHoverItem( null );
+        this._setHoverItem( null, null );
       }
     },
 
-    _setHoverItem : function( item ) {
+    _setHoverItem : function( item, row ) {
       var oldItem = this._hoverItem;
       this._hoverItem = item;
+      this._hoverRow = row;
       if( oldItem !== item ) {
+        this.dispatchSimpleEvent( "updateToolTip", this );
         this._renderAsync( oldItem );
       }
       this._renderAsync( item );

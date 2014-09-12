@@ -332,34 +332,38 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       cont.destroy();
     },
 
-//    testSetCellToolTipsEnabled_True : function() {
-//      var cont = this._createContainer();
-//      cont.setHeight( 100 );
-//
-//      cont.setCellToolTipsEnabled( true );
-//
-//      assertEquals( "", getRows( cont )[ 0 ].getToolTipText() );
-//    },
-//
-//    testSetCellToolTipsEnabled_TrueAfterHeightChange : function() {
-//      var cont = this._createContainer();
-//      cont.setHeight( 100 );
-//
-//      cont.setCellToolTipsEnabled( true );
-//      cont.setHeight( 200 );
-//
-//      assertEquals( "", cont.getLastChild().getToolTipText() );
-//    },
-//
-//    testSetCellToolTipsEnabled_False : function() {
-//      var cont = this._createContainer();
-//      cont.setHeight( 100 );
-//
-//      cont.setCellToolTipsEnabled( true );
-//      cont.setCellToolTipsEnabled( false );
-//
-//      assertNull( getRows( cont )[ 0 ].getToolTipText() );
-//    },
+    testSetCellToolTipsEnabled_True : function() {
+      var cont = this._createContainer();
+      cont.setHeight( 100 );
+
+      cont.setCellToolTipsEnabled( true );
+
+      assertEquals( "", cont.getToolTipText() ); // "" causes the tooltip to be bound, but not shown
+    },
+
+    testSetCellToolTipsEnabled_False : function() {
+      var cont = this._createContainer();
+      cont.setHeight( 100 );
+
+      cont.setCellToolTipsEnabled( true );
+      cont.setCellToolTipsEnabled( false );
+
+      assertNull( cont.getToolTipText() );
+    },
+
+    testRequestToolTipText_DispatchesBubblingEvent : function() {
+      var grid = this._createDefaultTree();
+      var row = grid.getRowContainer().getRow( 1 );
+      TestUtil.hoverFromTo( document.body, row.$el );
+      var data;
+      grid.addEventListener( "renderCellToolTip", function( value ) {
+        data = value;
+      } );
+
+      grid.getRowContainer().requestToolTipText();
+
+      assertIdentical( row, data );
+    },
 
     /////////
     // Helper
