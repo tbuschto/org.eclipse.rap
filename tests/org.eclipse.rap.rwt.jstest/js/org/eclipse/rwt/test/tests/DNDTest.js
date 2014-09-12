@@ -878,10 +878,10 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
       var row = tree._rowContainer._children[ 1 ];
       assertTrue( row.hasState( "dnd_selected") );
       assertNull( row.getBackgroundColor() ); // hover disabled
-      assertTrue( row._overlayElement.style.backgroundColor !== "" );
+      assertTrue( row.$overlay.style.backgroundColor !== "" );
       // drop
       TestUtil.fakeMouseEventDOM( targetNode, "mouseup", leftButton );
-      assertTrue( row._overlayElement.style.display == "none" );
+      assertTrue( row.$overlay.style.display == "none" );
       // NOTE: hover effect temporarily disabled on trees without FULL_SELECTION
       //assertEquals( "#b5b5b5", tree._rowContainer._children[ 1 ].getBackgroundColor() );
     },
