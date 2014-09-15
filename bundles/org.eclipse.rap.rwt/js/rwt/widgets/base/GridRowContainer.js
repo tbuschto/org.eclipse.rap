@@ -452,8 +452,9 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     _setHoverItem : function( item, row ) {
       var oldItem = this._hoverItem;
       this._hoverItem = item;
-      this._hoverRow = row;
+      this._hoverRow = row || ( item ? this._findRowByItem( item ) : null );
       if( oldItem !== item ) {
+        this.dispatchSimpleEvent( "hoverItem", item );
         this.dispatchSimpleEvent( "updateToolTip", this );
         this._renderAsync( oldItem );
       }

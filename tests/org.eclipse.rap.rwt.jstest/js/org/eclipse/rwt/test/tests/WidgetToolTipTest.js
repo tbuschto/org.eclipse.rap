@@ -349,7 +349,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.WidgetToolTipTest", {
       assertFalse( toolTip.isSeeable() );
     },
 
-    testTextIsEmptyString_ShowsWhenTextIsUpdated : function() {
+    testTextIsEmptyString_ShowsWhenTextIsUpdatedWithValidString : function() {
       widget.setToolTipText( "" );
       TestUtil.hoverFromTo( document.body, widget.getElement() );
       TestUtil.forceInterval( toolTip._showTimer );
@@ -358,6 +358,17 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.WidgetToolTipTest", {
       toolTip.updateText();
 
       assertTrue( toolTip.isSeeable() );
+    },
+
+    testTextIsEmptyString_HidesWhenAreadyVisible : function() {
+      widget.setToolTipText( "foo" );
+      TestUtil.hoverFromTo( document.body, widget.getElement() );
+      TestUtil.forceInterval( toolTip._showTimer );
+
+      widget.setToolTipText( "" );
+      toolTip.updateText();
+
+      assertFalse( toolTip.isSeeable() );
     },
 
     testAppear_DefaultDelayNotRestartedOnMouseMove : function() {

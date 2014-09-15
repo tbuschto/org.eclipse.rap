@@ -519,7 +519,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       tree.setUserData( "toolTipMarkupEnabled", true );
       this._fillTree( tree, 10 );
       TestUtil.flush();
-      var row = tree.getRowContainer().getFirstChild();
+      var row = tree.getRowContainer().getRow( 0 );
 
       TestUtil.fakeMouseEvent( row, "mouseover", 10, 10 );
       TestUtil.fakeMouseEvent( row, "mousemove", 10, 10 );
@@ -539,7 +539,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.protocolSet( "w3", { "enableCellToolTip" : true } );
       this._fillTree( widget, 10 );
       TestUtil.flush();
-      var row = widget.getRowContainer().getFirstChild();
+      var row = widget.getRowContainer().getRow( 0 );
 
       TestUtil.fakeMouseEvent( row, "mouseover", 10, 10 );
       TestUtil.fakeMouseEvent( row, "mousemove", 10, 10 );
@@ -548,7 +548,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
 
       var labelObject = rwt.widgets.base.WidgetToolTip.getInstance()._label;
       assertEquals( "foo &amp;&amp; &lt;&gt; &quot;<br/> bar", labelObject.getCellContent( 0 ) );
-      assertEquals( "", row.getToolTipText() );
+      assertEquals( "", widget.getRowContainer().getToolTipText() );
       shell.destroy();
     },
 
@@ -557,7 +557,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.protocolSet( "w3", { "enableCellToolTip" : true } );
       this._fillTree( widget, 10 );
       TestUtil.flush();
-      var row = widget.getRowContainer().getSubContainer( 0 ).getFirstChild();
+      var row = widget.getRowContainer().getSubContainer( 0 ).getRow( 0 );
 
       TestUtil.fakeMouseEvent( row, "mouseover", 10, 10 );
       TestUtil.fakeMouseEvent( row, "mousemove", 10, 10 );
@@ -566,11 +566,11 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
 
       var labelObject = rwt.widgets.base.WidgetToolTip.getInstance()._label;
       assertEquals( "foo", labelObject.getCellContent( 0 ) );
-      assertEquals( "", row.getToolTipText() );
+      assertEquals( "", widget.getRowContainer().getSubContainer( 0 ).getToolTipText() );
       widget.destroy();
     },
 
-    testSetCellToolTipTextByProtocol_ToolTipHasBeenUbound : function() {
+    testSetCellToolTipTextByProtocol_ToolTipHasBeenUnbound : function() {
       var shell = TestUtil.createShellByProtocol( "w2" );
       shell.setLocation( 0, 0 );
       var widget = this._createDefaultTreeByProtocol( "w3", "w2", [] );
@@ -578,7 +578,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.protocolSet( "w3", { "enableCellToolTip" : true } );
       this._fillTree( widget, 10 );
       TestUtil.flush();
-      var row = widget.getRowContainer().getFirstChild();
+      var row = widget.getRowContainer().getRow( 0 );
       TestUtil.fakeMouseEvent( row, "mouseover", 10, 10 );
       TestUtil.fakeMouseEvent( row, "mousemove", 10, 10 );
       TestUtil.forceInterval( rwt.widgets.base.WidgetToolTip.getInstance()._showTimer );
@@ -607,7 +607,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       widget.setItemMetrics( 0, 0, 20, 0, 0, 0, 20, 0, 10 );
       widget.setItemMetrics( 1, 20, 20, 0, 0, 20, 20, 0, 10 );
       TestUtil.flush();
-      var row = widget.getRowContainer().getFirstChild();
+      var row = widget.getRowContainer().getRow( 0 );
 
       TestUtil.fakeMouseEvent( row, "mouseover", 30, 10 );
       TestUtil.fakeMouseEvent( row, "mousemove", 30, 10 );
@@ -631,7 +631,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       TestUtil.flush();
       var rowContainer = widget.getRowContainer();
       rowContainer._splitOffset = 20;
-      var row = rowContainer.getSubContainer( 1 ).getFirstChild();
+      var row = rowContainer.getSubContainer( 1 ).getRow( 0 );
 
       TestUtil.fakeMouseEvent( row, "mouseover", 30, 10 );
       TestUtil.fakeMouseEvent( row, "mousemove", 30, 10 );
@@ -654,7 +654,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridTest", {
       widget.setItemMetrics( 0, 0, 20, 0, 0, 0, 20, 0, 10 );
       widget.setItemMetrics( 1, 20, 20, 0, 0, 20, 20, 0, 10 );
       TestUtil.flush();
-      var row = widget.getRowContainer().getFirstChild();
+      var row = widget.getRowContainer().getRow( 0 );
 
       TestUtil.fakeMouseEvent( shell, "mouseover", 30, 10 );
       rwt.widgets.base.WidgetToolTip.getInstance()._onshowtimer();

@@ -549,12 +549,13 @@ rwt.qx.Class.define( "rwt.widgets.Grid", {
     _checkAndProcessHyperlink : function( event ) {
       var hyperlink = null;
       var target = event.getOriginalTarget();
-      if( this._config.markupEnabled && target instanceof rwt.widgets.base.GridRow ) {
+      if( this._config.markupEnabled && target instanceof rwt.widgets.base.GridRowContainer ) {
         hyperlink = this._findHyperlink( event );
         if( hyperlink !== null && this._isRWTHyperlink( hyperlink ) ) {
           event.setDefaultPrevented( true );
           if( event.getType() === "click" ) {
-            var item = this._rowContainer.findItemByRow( target );
+            var row = this._rowContainer.findRowByElement( event.getDomTarget() );
+            var item = this._rowContainer.findItemByRow( row );
             var text = hyperlink.getAttribute( "href" );
             if( !text ) {
               text = hyperlink.innerHTML;

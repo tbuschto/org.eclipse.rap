@@ -710,9 +710,6 @@ org.eclipse.rwt.test.fixture.TestUtil = {
     if( target.$el ) {
       return target.$el.get( 0 );
     }
-    if( target.$rows ) {
-      return target.$rows.get( 0 );
-    }
     return target;
   },
 

@@ -21,8 +21,7 @@ rwt.widgets.util.GridRowContainerWrapper = function() {
   this._width = 0;
   this._splitOffset = 0;
   this._rowWidth = 0;
-  this.addEventListener( "mouseover", this._onRowOver, this );
-  this.addEventListener( "mouseout", this._onRowOver, this );
+  this.addEventListener( "hoverItem", this._onHoverItem, this );
 };
 
 rwt.widgets.util.GridRowContainerWrapper.createInstance = function() {
@@ -69,7 +68,8 @@ rwt.widgets.util.GridRowContainerWrapper._CONTAINER_DELEGATES = [
   "setBaseAppearance",
   "setCellToolTipsEnabled",
   "getRow",
-  "getRowCount"
+  "getRowCount",
+  "setToolTipText"
 ];
 
 rwt.widgets.util.GridRowContainerWrapper._CONTAINER_GETTER_DELEGATES = [
@@ -232,12 +232,9 @@ rwt.widgets.util.GridRowContainerWrapper.prototype = {
     return result;
   },
 
-  _onRowOver : function( event ) {
-    var eventTarget = event.getCurrentTarget();
+  _onHoverItem : function( item ) {
     for( var i = 0; i < this._container.length; i++ ) {
-      if( this._container[ i ] !== eventTarget ) {
-        this._container[ i ].setHoverItem( eventTarget.getHoverItem() );
-      }
+      this._container[ i ]._setHoverItem( item );
     }
   },
 
