@@ -85,8 +85,8 @@ rwt.remote.DNDSupport.prototype = {
         this.setCurrentTargetElement( event.getOriginalTarget() );
         // fix for bug 296348
         rwt.widgets.util.WidgetUtil._fakeMouseEvent( this._currentTargetElement, "mouseout" );
-        var sourceWidget = dndHandler.__dragCache.sourceWidget;
-        var feedbackWidget = this._getFeedbackWidget( control, sourceWidget );
+        var sourceElement = dndHandler.__dragCache.sourceElement;
+        var feedbackWidget = this._getFeedbackWidget( control, sourceElement );
         // Note: Unlike SWT, the feedbackWidget can not be rendered behind
         // the cursor, i.e. with a negative offset, as the widget would
         // get all the mouse-events instead of a potential drop-target.
@@ -414,25 +414,21 @@ rwt.remote.DNDSupport.prototype = {
   },
 
   // TODO [tb] : allow overwrite using DragSourceEvent.image?
-  _getFeedbackWidget : function( control, target ) {
-    var item = target;
-    var success = false;
+  _getFeedbackWidget : function( sourceControl, sourceElement ) {
     if( this._dragFeedbackWidget == null ) {
       this._dragFeedbackWidget = new rwt.widgets.base.MultiCellWidget( [ "image", "label" ] );
       this._dragFeedbackWidget.setOpacity( 0.7 );
       this._dragFeedbackWidget.setEnabled( false );
       this._dragFeedbackWidget.setPadding( 2 );
     }
-    while( !success && item != control ) {
-      if( item instanceof rwt.widgets.base.GridRow ) {
-        success = true;
-        this._configureTreeRowFeedback( item );
-      }
-      if( !success ) {
-        item = item.getParent();
+    if( sourceControl instanceof rwt.widgets.Grid ) {
+      var row = sourceControl.getRowContainer().findRowByElement( sourceElement );
+      if( row ) {
+        this._configureTreeRowFeedback( row );
+        return this._dragFeedbackWidget;
       }
     }
-    return success ? this._dragFeedbackWidget : null;
+    return null;
   },
 
   _configureTreeRowFeedback : function( row ) {

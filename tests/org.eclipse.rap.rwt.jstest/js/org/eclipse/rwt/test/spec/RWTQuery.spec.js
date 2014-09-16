@@ -413,22 +413,22 @@ describe( "RWTQuery", function() {
 
       it( "does not set forbidden attributes", function() {
         $( element ).attr( "id", "foo" );
-        $( element ).attr( "style", "bar" );
+        $( element ).attr( "style", "display:none" );
         $( element ).attr( "class", "foobar" );
 
         expect( element.getAttribute( "id" ) ).toBeFalsy();
-        expect( element.getAttribute( "style" ) ).toBeFalsy();
+        expect( element.style.display ).not.toBe( "none" );
         expect( element.getAttribute( "class" ) ).toBeFalsy();
       } );
 
       it( "does set forbidden attributes if privileged", function() {
         var $ = rwt.util._RWTQuery;
         $( element ).attr( "id", "foo" );
-        $( element ).attr( "style", "bar" );
+        $( element ).attr( "style", "display:none;" );
         $( element ).attr( "class", "foobar" );
 
         expect( element.getAttribute( "id" ) ).toBe( "foo" );
-        expect( element.getAttribute( "style" ) ).toBe( "bar" );
+        expect( element.style.display ).toBe( "none" );
         expect( element.getAttribute( "class" ) ).toBe( "foobar" );
       } );
 
@@ -630,28 +630,26 @@ describe( "RWTQuery", function() {
       it( "sets border for Border object", function() {
         $( element ).css( "border", new rwt.html.Border( 2, "solid", "rgb(255, 0, 255)" ) );
 
-        var result = element.style.border;
-        expect( result ).toContain( "2px" );
-        expect( result ).toContain( "solid" );
-        expect( result ).toContain( "rgb(255, 0, 255)" );
+        expect( element.style.borderLeftWidth ).toBe( "2px" );
+        expect( element.style.borderTopStyle ).toBe( "solid" );
+        expect( element.style.borderBottomColor ).toBe( "rgb(255, 0, 255)" );
       } );
 
       it( "sets font directly for strings", function() {
-        $( element ).css( "font", "12px bold fantasy" );
+        $( element ).css( "font", "bold 12px fantasy" );
 
-        var result = element.style.font;
-        expect( result ).toContain( "12px" );
-        expect( result ).toContain( "bold" );
-        expect( result ).toContain( "fantasy" );
+        expect( element.style.fontSize ).toBe( "12px" );
+        expect( element.style.fontWeight ).toBe( "bold" );
+        expect( element.style.fontFamily ).toContain( "fantasy" );
       } );
 
       it( "sets font for Font object", function() {
         $( element ).css( "border", rwt.html.Font.fromString( "12px bold fantasy" ) );
 
         var result = element.style.font;
-        expect( result ).toContain( "12px" );
-        expect( result ).toContain( "bold" );
-        expect( result ).toContain( "fantasy" );
+        expect( element.style.fontSize ).toBe( "12px" );
+        expect( element.style.fontWeight ).toBe( "bold" );
+        expect( element.style.fontFamily ).toContain( "fantasy" );
       } );
 
     } );

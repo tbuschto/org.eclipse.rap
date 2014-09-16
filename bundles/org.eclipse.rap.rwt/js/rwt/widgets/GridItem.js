@@ -36,7 +36,7 @@ rwt.qx.Class.define( "rwt.widgets.GridItem", {
     this._foreground = null;
     this._cellForegrounds = [];
     this._background = null;
-    this.$cellBackgrounds = [];
+    this._cellBackgrounds = [];
     this._checked = false;
     this._grayed = false;
     this._cellChecked = [];
@@ -74,7 +74,7 @@ rwt.qx.Class.define( "rwt.widgets.GridItem", {
     this._foreground = null;
     this._cellForegrounds = null;
     this._background = null;
-    this.$cellBackgrounds = null;
+    this._cellBackgrounds = null;
     this._cellChecked = null;
     this._cellGrayed = null;
     this._cellCheckable = null;
@@ -140,7 +140,7 @@ rwt.qx.Class.define( "rwt.widgets.GridItem", {
       this._background = null;
       this._foreground = null;
       this._font = null;
-      this.$cellBackgrounds = [];
+      this._cellBackgrounds = [];
       this._cellForegrounds = [];
       this._cellFonts = [];
       this._variant = null;
@@ -204,7 +204,7 @@ rwt.qx.Class.define( "rwt.widgets.GridItem", {
     },
 
     getCellBackground : function( column ) {
-      var result = this.$cellBackgrounds[ column ];
+      var result = this._cellBackgrounds[ column ];
       return typeof result === "string" ? result : null;
     },
 
@@ -213,7 +213,7 @@ rwt.qx.Class.define( "rwt.widgets.GridItem", {
     },
 
     setCellBackgrounds : function( colors ) {
-      this.$cellBackgrounds = colors;
+      this._cellBackgrounds = colors;
       this._update( "content" );
     },
 

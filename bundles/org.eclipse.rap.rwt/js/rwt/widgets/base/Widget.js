@@ -3183,7 +3183,7 @@ rwt.qx.Class.define( "rwt.widgets.base.Widget", {
     // SELECTABLE SUPPORT
 
     _applySelectable : function( value ) {
-      rwt.html.Style.setUserSelect( this, value );
+      rwt.html.Style.setUserSelect( this, value ?  "" : "none" );
     },
 
     //////////////////

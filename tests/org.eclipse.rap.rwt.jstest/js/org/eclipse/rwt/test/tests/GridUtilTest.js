@@ -443,10 +443,10 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridUtilTest", {
       tree.setLinesVisible( true );
       TestUtil.flush();
       var border = tree._rowContainer.getSubContainer( 0 )._getHorizontalGridBorder();
-      var row = tree._rowContainer.getSubContainer( 0 ).getRow( 0 );
+      var element = tree._rowContainer.getSubContainer( 0 ).getRow( 0 ).$el.get( 0 );
       assertTrue( tree.hasState( "linesvisible" ) );
-      assertEquals( border.getWidthBottom(), parseInt( row.$el.css( "borderBottomWidth" ), 10 ) );
-      assertEquals( border.getWidthTop(), parseInt( row.$el.css( "borderTopWidth" ), 10 ) );
+      assertEquals( border.getWidthBottom(), parseInt( element.style.borderBottomWidth, 10 ) );
+      assertEquals( border.getWidthTop(), parseInt( element.style.borderTopWidth, 10 ) );
       tree.destroy();
     },
 

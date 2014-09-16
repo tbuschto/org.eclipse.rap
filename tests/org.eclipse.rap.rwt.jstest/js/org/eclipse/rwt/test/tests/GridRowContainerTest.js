@@ -287,8 +287,10 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.setLinesVisible( true );
       TestUtil.flush();
       var border = tree._rowContainer._getHorizontalGridBorder();
-      assertEquals( border.getWidthBottom(), parseInt( row.$el.css( "borderBottomWidth" ), 10 ) );
-      assertEquals( border.getWidthTop(), parseInt( row.$el.css( "borderTopWidth" ), 10 ) );
+      // NOTE: FF has some weired behavior here, using computed css it returns 0.8px instead of 1px
+      var element = row.$el.get( 0 );
+      assertEquals( border.getWidthBottom(), parseInt( element.style.borderBottomWidth, 10 ) );
+      assertEquals( border.getWidthTop(), parseInt( element.style.borderTopWidth, 10 ) );
       tree.destroy();
     },
 
@@ -300,8 +302,9 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       TestUtil.flush();
       var border = tree._rowContainer._getHorizontalGridBorder();
       var row = tree._rowContainer.getRow( 0 );
-      assertEquals( border.getWidthBottom(), parseInt( row.$el.css( "borderBottomWidth" ), 10 ) );
-      assertEquals( border.getWidthTop(), parseInt( row.$el.css( "borderTopWidth" ), 10 ) );
+      var element = row.$el.get( 0 );
+      assertEquals( border.getWidthBottom(), parseInt( element.style.borderBottomWidth, 10 ) );
+      assertEquals( border.getWidthTop(), parseInt( element.style.borderTopWidth, 10 ) );
       tree.destroy();
     },
 

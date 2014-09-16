@@ -118,8 +118,8 @@ rwt.event.EventHandlerUtil = {
 
   _domEventBlocker : function( event ) {
     rwt.event.EventHandlerUtil.stopDomEvent( event );
-    event.cancelBubble = true; // MSIE
-    if( event.stopPropagation ) {
+      event.cancelBubble = true; // MSIE
+      if( event.stopPropagation ) {
       event.stopPropagation();
     }
   },

@@ -1219,7 +1219,6 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
       var tree = target.control;
       // Target is also source:
       this.createDragSource( tree );
-      var source = this.createDragSource();
       TestUtil.flush();
       var itemNode0 = tree._rowContainer.getRow( 0 ).$el.get( 0 );
       var itemNode1 = tree._rowContainer.getRow( 1 ).$el.get( 0 );
@@ -1243,12 +1242,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
 
     testFeedbackWidgetTree : function() {
       var leftButton = rwt.event.MouseEvent.buttons.left;
-      var argsMap = {
-        "appearance" : "tree",
-        "selectionPadding" : [ 2, 2 ]
-      };
       var tree = this.createTree();
-      var source = this.createDragSource( tree );
+      this.createDragSource( tree );
       this.createTreeItem( 0, tree, tree );
       TestUtil.flush();
       var sourceNode = tree._rowContainer.getRow( 0 ).$el.get( 0 );
@@ -1268,12 +1263,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
 
     testFeedbackWidgetEscape : function() {
       var leftButton = rwt.event.MouseEvent.buttons.left;
-      var argsMap = {
-        "appearance" : "tree",
-        "selectionPadding" : [ 2, 2 ]
-      };
       var tree = this.createTree();
-      var source = this.createDragSource( tree );
+      this.createDragSource( tree );
       this.createTreeItem( 0, tree, tree ).setTexts( [ "te&st" ] );
       TestUtil.flush();
       var sourceNode = tree._rowContainer.getRow( 0 ).$el.get( 0 );
@@ -1290,12 +1281,8 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
 
     testFeedbackWidgetTreeWithImage : function() {
       var leftButton = rwt.event.MouseEvent.buttons.left;
-      var argsMap = {
-        "appearance" : "tree",
-        "selectionPadding" : [ 2, 2 ]
-      };
       var tree = this.createTree();
-      var source = this.createDragSource( tree );
+      this.createDragSource( tree );
       var item0 = this.createTreeItem( 0, tree, tree );
       item0.setImages( [ [ "bla.jpg", 10, 10 ] ] );
       TestUtil.flush();
@@ -1367,7 +1354,7 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
       TestUtil.prepareTimerUse();
       TestUtil.initRequestLog();
       var source = this.createDragSource();
-      var dragSource = this.createDragSourceByProtocol( "w123", "c0" );
+      this.createDragSourceByProtocol( "w123", "c0" );
       var sourceNode = source.control._getTargetNode();
       var doc = document.body;
       // drag

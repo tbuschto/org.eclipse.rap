@@ -316,7 +316,7 @@ var prop_element = unwrapSetterArgsFor( function( element, args ) {
 
 var removeProp_element = unwrapSetterArgsFor( function( element, args ) {
   try {
-    element[ args[ 0 ] ] = undefined;
+    element[ args[ 0 ] ] = "";
     delete element[ args[ 0 ] ];
   } catch( ex ) {
     // some properties can not be deleted
