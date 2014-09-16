@@ -1036,14 +1036,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRow", {
 
     _isTreeColumn : function( columnIndex, config ) {
       return columnIndex === config.treeColumn;
-    },
-
-    //////////////
-    // DND-Support
-
-   supportsDrop : function() {
-     return true;
-   }
+    }
 
   }
 

@@ -238,9 +238,9 @@ rwt.widgets.util.GridRowContainerWrapper.prototype = {
     }
   },
 
-  _findRowByItem : function( item, column ) {
+  findRowByItem : function( item, column ) {
     var pos = column < this._fixedColumns ? 0 : 1;
-    return this._container[ pos ]._findRowByItem( item );
+    return this._container[ pos ].findRowByItem( item );
   }
 
 };

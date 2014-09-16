@@ -122,9 +122,9 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
       var container = tree.getRowContainer();
       var rowCount = container.getRowCount();
-      var sampleTop = container._findRowByItem( items[ 1 ] ).$el.get( 0 );
-      var sampleMiddle = container._findRowByItem( items[ 6 ] ).$el.get( 0 );
-      var sampleBottom = container._findRowByItem( items[ rowCount ] ).$el.get( 0 );
+      var sampleTop = container.findRowByItem( items[ 1 ] ).$el.get( 0 );
+      var sampleMiddle = container.findRowByItem( items[ 6 ] ).$el.get( 0 );
+      var sampleBottom = container.findRowByItem( items[ rowCount ] ).$el.get( 0 );
 
       assertEquals( 0, getElementBounds( sampleTop ).top );
       assertContains( "Test1", sampleTop.innerHTML );
@@ -152,9 +152,9 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
 
       var container = tree.getRowContainer();
       var rowCount = container.getRowCount();
-      var sampleTop = container._findRowByItem( items[ 1 ] ).$el.get( 0 );
-      var sampleMiddle = container._findRowByItem( items[ 6 ] ).$el.get( 0 );
-      var sampleBottom = container._findRowByItem( items[ rowCount ] ).$el.get( 0 );
+      var sampleTop = container.findRowByItem( items[ 1 ] ).$el.get( 0 );
+      var sampleMiddle = container.findRowByItem( items[ 6 ] ).$el.get( 0 );
+      var sampleBottom = container.findRowByItem( items[ rowCount ] ).$el.get( 0 );
 
       assertEquals( 0, getElementBounds( sampleTop ).top );
       assertContains( "Test1", sampleTop.innerHTML );

@@ -19,7 +19,7 @@ rwt.remote.DNDSupport = function() {
   this._requestScheduled = false;
   this._currentDragControl = null;
   this._currentDropControl = null;
-  this._currentTargetWidget = null;
+  this._currentTargetElement = null;
   this._currentMousePosition = { x : 0, y : 0 };
   this._actionOverwrite = null;
   this._dataTypeOverwrite = null;
@@ -79,13 +79,12 @@ rwt.remote.DNDSupport.prototype = {
         var dndHandler = rwt.event.DragAndDropHandler.getInstance();
         dndHandler.clearActions();
         var doc = rwt.widgets.base.ClientDocument.getInstance();
-        doc.addEventListener( "mouseover", this._onMouseOver, this );
+        doc.addEventListener( "elementOver", this._onMouseOver, this );
         doc.addEventListener( "keydown", this._onKeyEvent, this );
         doc.addEventListener( "keyup", this._onKeyEvent, this );
-        this.setCurrentTargetWidget( event.getOriginalTarget() );
+        this.setCurrentTargetElement( event.getOriginalTarget() );
         // fix for bug 296348
-        var widgetUtil = rwt.widgets.util.WidgetUtil;
-        widgetUtil._fakeMouseEvent( this._currentTargetWidget, "mouseout" );
+        rwt.widgets.util.WidgetUtil._fakeMouseEvent( this._currentTargetElement, "mouseout" );
         var sourceWidget = dndHandler.__dragCache.sourceWidget;
         var feedbackWidget = this._getFeedbackWidget( control, sourceWidget );
         // Note: Unlike SWT, the feedbackWidget can not be rendered behind
@@ -185,7 +184,7 @@ rwt.remote.DNDSupport.prototype = {
   _dragOutHandler : function( event ) {
     var target = event.getCurrentTarget();
     var mouseEvent = event.getMouseEvent();
-    if( this._currentTargetWidget !== mouseEvent.getTarget() ) {
+    if( this._currentTargetElement !== mouseEvent.getDomTarget() ) {
       this._onMouseOver( mouseEvent );
     }
     var dndHandler = rwt.event.DragAndDropHandler.getInstance();
@@ -407,12 +406,9 @@ rwt.remote.DNDSupport.prototype = {
 
   _getCurrentFeedbackTarget : function() {
     var result = null;
-    var widget = this._currentTargetWidget;
-    if( widget instanceof rwt.widgets.base.GridRow ) {
-      // _currentDropControl could be another tree
-      if( this._currentDropControl && this._currentDropControl.contains( widget ) ) {
-        result = widget;
-      }
+    if( this._currentDropControl instanceof rwt.widgets.Grid ) {
+      var element = this._currentTargetElement;
+      result = this._currentDropControl.getRowContainer().findRowByElement( element );
     }
     return result;
   },
@@ -483,19 +479,18 @@ rwt.remote.DNDSupport.prototype = {
   },
 
   _onMouseOver : function( event ) {
-    var target = event.getTarget();
+    var target = event.getDomTarget();
     if( this._dropFeedbackRenderer != null ) {
-      var node = event.getDomTarget();
-      if( !this._dropFeedbackRenderer.isFeedbackNode( node ) ) {
-        this.setCurrentTargetWidget( target );
+      if( !this._dropFeedbackRenderer.isFeedbackNode( target ) ) {
+        this.setCurrentTargetElement( target );
       }
     } else {
-      this.setCurrentTargetWidget( target );
+      this.setCurrentTargetElement( target );
     }
   },
 
-  setCurrentTargetWidget : function( target ) {
-    this._currentTargetWidget = target;
+  setCurrentTargetElement : function( target ) {
+    this._currentTargetElement = target;
     this._renderFeedback();
   },
 
@@ -519,9 +514,9 @@ rwt.remote.DNDSupport.prototype = {
   _cleanUp : function() {
     // fix for bug 296348
     var widgetUtil = rwt.widgets.util.WidgetUtil;
-    widgetUtil._fakeMouseEvent( this._currentTargetWidget, "elementOver" );
-    widgetUtil._fakeMouseEvent( this._currentTargetWidget, "mouseover" );
-    this.setCurrentTargetWidget( null );
+    widgetUtil._fakeMouseEvent( this._currentTargetElement, "elementOver" );
+    widgetUtil._fakeMouseEvent( this._currentTargetElement, "mouseover" );
+    this.setCurrentTargetElement( null );
     if( this._currentDropControl != null) {
       this.setFeedback( this._currentDropControl, null, 0 );
       this._currentDropControl = null;
@@ -534,7 +529,7 @@ rwt.remote.DNDSupport.prototype = {
     this._currentMousePosition.x = 0;
     this._currentMousePosition.y = 0;
     var doc = rwt.widgets.base.ClientDocument.getInstance();
-    doc.removeEventListener( "mouseover", this._onMouseOver, this );
+    doc.removeEventListener( "elementOver", this._onMouseOver, this );
     doc.removeEventListener( "keydown", this._onKeyEvent, this );
     doc.removeEventListener( "keyup", this._onKeyEvent, this );
   },

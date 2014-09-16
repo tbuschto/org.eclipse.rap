@@ -194,13 +194,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       return this.$rows.prop( "children" )[ index ][ "row" ];
     },
 
-    findRowByElement : function( target ) {
-      while( target && !target.row && !target.rwtWidget ) {
-        target = target.parentElement;
-      }
-      return target ? target.row : null;
-    },
-
     renderAll : function() {
       this._renderAll( false );
     },
@@ -217,7 +210,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     renderItem : function( item ) {
       if( this._isCreated && item != null ) {
-        var row = this._findRowByItem( item );
+        var row = this.findRowByItem( item );
         if( row!= null ) {
           this._renderRow( row, item );
         }
@@ -231,6 +224,13 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       }
     },
 
+    findRowByElement : function( target ) {
+      while( target && !target.row && !target.rwtWidget ) {
+        target = target.parentElement;
+      }
+      return target ? target.row : null;
+    },
+
     findItemByRow : function( targetRow ) {
       var index = -1;
       var rowCount = this.getRowCount();
@@ -240,6 +240,11 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         }
       }
       return index !== -1 ? this._items[ index ] : null;
+    },
+
+    findRowByItem : function( targetItem ) {
+      var index = this._items.indexOf( targetItem );
+      return index !== -1 ? this.getRow( index ) : null;
     },
 
     getHoverItem : function() {
@@ -374,11 +379,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       } );
     },
 
-    _findRowByItem : function( targetItem ) {
-      var index = this._items.indexOf( targetItem );
-      return index !== -1 ? this.getRow( index ) : null;
-    },
-
     _updateRows : function( from, delta, contentOnly ) {
       this._updateRowsEvenState();
       var item = this._topItem;
@@ -408,12 +408,20 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _sortRows : function( newFirstRow, forwards ) {
       var lastRowIndex = this.getRowCount() - 1;
+      var hoverRowIndex = -1;
+      if( this._hoverRow ) {
+        hoverRowIndex = this._items.indexOf( this.findItemByRow( this._hoverRow ) );
+      }
       while( this.getRow( 0 ) !== newFirstRow ) {
         if( forwards ) {
           this.$rows.append( this.getRow( 0 ).$el );
         } else {
           this.$rows.prepend( this.getRow( lastRowIndex ).$el );
         }
+      }
+      if( hoverRowIndex !== -1 ) {
+        var newHoverRow = this.getRow( hoverRowIndex );
+        this._setHoverItem( this.findItemByRow( newHoverRow ), this._hoverRow );
       }
     },
 
@@ -452,7 +460,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     _setHoverItem : function( item, row ) {
       var oldItem = this._hoverItem;
       this._hoverItem = item;
-      this._hoverRow = row || ( item ? this._findRowByItem( item ) : null );
+      this._hoverRow = row || ( item ? this.findRowByItem( item ) : null );
       if( oldItem !== item ) {
         this.dispatchSimpleEvent( "hoverItem", item );
         this.dispatchSimpleEvent( "updateToolTip", this );
@@ -506,6 +514,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     _afterAppear : function() {
       this.base( arguments );
       this.setScrollLeft( this._scrollLeft );
+    },
+
+    supportsDrop : function() {
+      return true;
     }
 
   }

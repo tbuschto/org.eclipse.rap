@@ -29,7 +29,7 @@ rwt.widgets.util.GridCellToolTipSupport = {
     if( this._isValidToolTip( text ) ) {
       var grid = this._cell[ 0 ];
       var item = rwt.remote.ObjectRegistry.getObject( this._cell[ 1 ] );
-      var row = grid.getRowContainer()._findRowByItem( item, this._cell[ 2 ] );
+      var row = grid.getRowContainer().findRowByItem( item, this._cell[ 2 ] );
       if( row ) {
         grid.getRowContainer().setToolTipText( text );
         rwt.widgets.base.WidgetToolTip.getInstance().updateText();

@@ -106,7 +106,7 @@ rwt.qx.Class.define( "rwt.widgets.util.GridDNDFeedback", {
       if( value ) {
         // draw insert-indicator below row (1px heigher)
         var location = this._getRowLocation( row );
-        var height = row.getHeightValue();
+        var height = row.getHeight();
         location.y = location.y + ( height - 1 );
         this._showInsertIndicator( location.x, location.y );
       } else {
@@ -135,11 +135,11 @@ rwt.qx.Class.define( "rwt.widgets.util.GridDNDFeedback", {
 
     _getRowLocation : function( row ) {
       var location = { x : 0, y : 0 };
-      var node = row.getElement();
+      var node = row.$el.get( 0 );
       var treeNode = this._tree._getTargetNode();
       while( node != treeNode ) {
-        location.x += parseInt( node.style.left || 0, 10 );
-        location.y += parseInt( node.style.top || 0, 10 );
+        location.x += node.offsetLeft;
+        location.y += node.offsetTop;
         node = node.parentNode;
       }
       return location;
@@ -229,7 +229,7 @@ rwt.qx.Class.define( "rwt.widgets.util.GridDNDFeedback", {
           if( newItem != null ) {
             var newTopIndex = this._tree._topItemIndex + offset;
             this._tree._setTopItemIndex( newTopIndex );
-            var newRow = this._tree._rowContainer._findRowByItem( newItem );
+            var newRow = this._tree._rowContainer.findRowByItem( newItem );
             var oldRow = this._currentRow;
             var wrapper = function() {
               this._targetUpdateCheck( oldRow, newRow );
@@ -246,7 +246,7 @@ rwt.qx.Class.define( "rwt.widgets.util.GridDNDFeedback", {
         //             scroll without changing the row order.
         if( newRow != this._currentRow && oldRow == this._currentRow ) {
           var dndSupport = rwt.remote.DNDSupport.getInstance();
-          dndSupport.setCurrentTargetWidget( newRow );
+          dndSupport.setCurrentTargetElement( newRow.$el.get( 0 ) );
         }
       }
     }

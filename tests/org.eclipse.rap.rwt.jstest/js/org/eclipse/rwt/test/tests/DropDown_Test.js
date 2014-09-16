@@ -1638,7 +1638,7 @@ var doubleClickItem = function( index ) {
 };
 
 var getItem = function( index ) {
-  return grid.getRowContainer()._findRowByItem( grid.getRootItem().getChild( index ) );
+  return grid.getRowContainer().findRowByItem( grid.getRootItem().getChild( index ) );
 };
 
 var forceTimer = function() {
