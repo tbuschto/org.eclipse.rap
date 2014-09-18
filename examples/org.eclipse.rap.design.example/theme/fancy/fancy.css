@@ -554,6 +554,8 @@ List-Item {
   background-color: transparent;
   color: inherit;
   background-image: none;
+  background-repeat: repeat;
+  background-position: left top;
   text-shadow: none;
   padding: 3px 5px;
 }
@@ -944,6 +946,8 @@ TabItem {
   border-top-color: white;
   border-bottom-color: white;
   background-image: none;
+  background-repeat: repeat;
+  background-position: left top;
   text-shadow: none;
   padding: 4px 6px 2px 5px;
   margin: 7px 1px 1px 0px;
@@ -3036,6 +3040,7 @@ Slider-UpButton-Icon[VERTICAL]:hover {
 /* CTabFolder, TabFolder */
 
 TabItem {
+  color: #4a4a4a;
   background-color: white;
 }
 
