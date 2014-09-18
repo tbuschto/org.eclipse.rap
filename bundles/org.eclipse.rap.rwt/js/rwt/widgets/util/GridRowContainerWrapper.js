@@ -78,7 +78,8 @@ rwt.widgets.util.GridRowContainerWrapper._CONTAINER_GETTER_DELEGATES = [
   "getHoverItem",
   "getElement",
   "getChildrenLength",
-  "findRowByElement"
+  "findRowByElement",
+  "getRowIndex"
 ];
 
 rwt.widgets.util.GridRowContainerWrapper.prototype = {

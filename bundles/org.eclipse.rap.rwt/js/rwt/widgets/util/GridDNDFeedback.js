@@ -210,7 +210,7 @@ rwt.qx.Class.define( "rwt.widgets.util.GridDNDFeedback", {
 
     _getScrollDirection : function( row ) {
       var result = 0;
-      var rowIndex = this._tree._rowContainer.indexOf( row );
+      var rowIndex = this._tree._rowContainer.getRowIndex( row );
       if( rowIndex === 0 ) {
         result = -1;
       } else if( rowIndex >= this._tree._rowContainer.getChildrenLength() - 2 ) {

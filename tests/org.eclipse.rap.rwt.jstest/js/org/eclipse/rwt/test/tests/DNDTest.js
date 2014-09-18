@@ -923,12 +923,9 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
       assertTrue( item0.isExpanded() );
     },
 
-    testTreeFeedbackScroll : function() {
+    testTreeFeedbackScrollDown : function() {
       var leftButton = rwt.event.MouseEvent.buttons.left;
-      TestUtil.prepareTimerUse();
-      TestUtil.initRequestLog();
-      var target = this.createDropTargetWithTree();
-      var tree = target.control;
+      var tree = this.createDropTargetWithTree().control;
       this.createTreeItem( 0, tree, tree );
       this.createTreeItem( 1, tree, tree );
       this.createTreeItem( 2, tree, tree );
@@ -937,44 +934,61 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.DNDTest", {
       TestUtil.flush();
       var sourceNode = source.control._getTargetNode();
       var targetNode = tree._rowContainer.getRow( 1 ).$el.get( 0 );
-      var treeNode = tree.getElement();
-      var doc = document.body;
-      // drag
       TestUtil.fakeMouseEventDOM( sourceNode, "mousedown", leftButton, 11, 11 );
-      TestUtil.fakeMouseEventDOM( doc, "mousemove", leftButton, 25, 15 );
-      assertNotNull( dndHandler.__dragCache );
-      assertTrue( dndHandler.__dragCache.dragHandlerActive );
-      // Over tree
-      TestUtil.fakeMouseEventDOM( treeNode, "mouseover", leftButton );
-      TestUtil.fakeMouseEventDOM( treeNode, "mousemove", leftButton );
-      assertEquals( tree, dndSupport._currentDropControl );
-      // over item 2
+      TestUtil.fakeMouseEventDOM( document.body, "mousemove", leftButton, 25, 15 );
+      TestUtil.fakeMouseEventDOM( tree.getElement(), "mouseover", leftButton );
+      TestUtil.fakeMouseEventDOM( tree.getElement(), "mousemove", leftButton );
       TestUtil.fakeMouseEventDOM( targetNode, "mouseover", leftButton );
       TestUtil.fakeMouseEventDOM( targetNode, "mousemove", leftButton );
       assertIdentical( tree._rowContainer.getRow( 1 ), dndSupport._getCurrentFeedbackTarget() );
-      assertNull( dndSupport._dropFeedbackRenderer );
-      dndSupport.setFeedback( tree, [ "FEEDBACK_SCROLL" ] );
-      // setting feedback
-      var feedback = dndSupport._dropFeedbackRenderer;
-      assertNotNull( feedback );
       assertEquals( 0, tree.getTopItemIndex() );
-      //assertEquals( 1, feedback._getScrollDirection( 1 ) );
-      TestUtil.clearTimerOnceLog();
-      // scroll to item 3
-      TestUtil.forceInterval( dndSupport._dropFeedbackRenderer._scrollTimer );
-      TestUtil.flush();
-      assertEquals( 1, tree.getTopItemIndex() );
-      assertTrue( TestUtil.getTimerOnceLog().length > 0 );
-      TestUtil.forceTimerOnce();
 
-      // scroll to item 4
+      dndSupport.setFeedback( tree, [ "FEEDBACK_SCROLL" ] );
+      TestUtil.clearTimerOnceLog();
       TestUtil.forceInterval( dndSupport._dropFeedbackRenderer._scrollTimer );
       TestUtil.flush();
-      assertEquals( 2, tree.getTopItemIndex() );
-      assertTrue( TestUtil.getTimerOnceLog().length > 0 );
       TestUtil.forceTimerOnce();
-      // drop
-      TestUtil.fakeMouseEventDOM( treeNode, "mouseup", leftButton );
+      TestUtil.forceInterval( dndSupport._dropFeedbackRenderer._scrollTimer );
+      TestUtil.flush();
+
+      assertEquals( 2, tree.getTopItemIndex() );
+      TestUtil.forceTimerOnce();
+      TestUtil.fakeMouseEventDOM( tree.getElement(), "mouseup", leftButton );
+      assertNull( dndSupport._dropFeedbackRenderer );
+    },
+
+    testTreeFeedbackScrollUp : function() {
+      var leftButton = rwt.event.MouseEvent.buttons.left;
+      var tree = this.createDropTargetWithTree().control;
+      this.createTreeItem( 0, tree, tree );
+      this.createTreeItem( 1, tree, tree );
+      this.createTreeItem( 2, tree, tree );
+      this.createTreeItem( 3, tree, tree );
+      var source = this.createDragSource();
+      tree.setTopItemIndex( 2 );
+      TestUtil.flush();
+      var sourceNode = source.control._getTargetNode();
+      var targetNode = tree._rowContainer.getRow( 0 ).$el.get( 0 );
+      TestUtil.fakeMouseEventDOM( sourceNode, "mousedown", leftButton, 11, 11 );
+      TestUtil.fakeMouseEventDOM( document.body, "mousemove", leftButton, 25, 15 );
+      TestUtil.fakeMouseEventDOM( tree.getElement(), "mouseover", leftButton );
+      TestUtil.fakeMouseEventDOM( tree.getElement(), "mousemove", leftButton );
+      TestUtil.fakeMouseEventDOM( targetNode, "mouseover", leftButton );
+      TestUtil.fakeMouseEventDOM( targetNode, "mousemove", leftButton );
+      assertIdentical( tree._rowContainer.getRow( 0 ), dndSupport._getCurrentFeedbackTarget() );
+      assertEquals( 2, tree.getTopItemIndex() );
+
+      dndSupport.setFeedback( tree, [ "FEEDBACK_SCROLL" ] );
+      TestUtil.clearTimerOnceLog();
+      TestUtil.forceInterval( dndSupport._dropFeedbackRenderer._scrollTimer );
+      TestUtil.flush();
+      TestUtil.forceTimerOnce();
+      TestUtil.forceInterval( dndSupport._dropFeedbackRenderer._scrollTimer );
+      TestUtil.flush();
+
+      assertEquals( 0, tree.getTopItemIndex() );
+      TestUtil.forceTimerOnce();
+      TestUtil.fakeMouseEventDOM( tree.getElement(), "mouseup", leftButton );
       assertNull( dndSupport._dropFeedbackRenderer );
     },
 

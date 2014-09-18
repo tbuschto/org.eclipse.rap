@@ -247,16 +247,13 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       return index !== -1 ? this.getRow( index ) : null;
     },
 
+    getRowIndex : function( row ) {
+      return this._items.indexOf( this.findItemByRow( row ) );
+    },
+
     getHoverItem : function() {
       return this._hoverItem;
     },
-
-//    setHoverItem : function( item ) {
-//      if( item ) {
-//        this._hoverTargetType = [ "other" ];
-//      }
-//      this._setHoverItem( item );
-//    },
 
     ///////////
     // Internal
@@ -410,7 +407,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       var lastRowIndex = this.getRowCount() - 1;
       var hoverRowIndex = -1;
       if( this._hoverRow ) {
-        hoverRowIndex = this._items.indexOf( this.findItemByRow( this._hoverRow ) );
+        hoverRowIndex = this.getRowIndex( this._hoverRow );
       }
       while( this.getRow( 0 ) !== newFirstRow ) {
         if( forwards ) {
