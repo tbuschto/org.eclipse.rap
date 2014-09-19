@@ -213,7 +213,7 @@ rwt.qx.Class.define( "rwt.widgets.util.GridDNDFeedback", {
       var rowIndex = this._tree._rowContainer.getRowIndex( row );
       if( rowIndex === 0 ) {
         result = -1;
-      } else if( rowIndex >= this._tree._rowContainer.getChildrenLength() - 2 ) {
+      } else if( rowIndex >= this._tree._rowContainer.getRowCount() - 2 ) {
         result = 1;
       }
       return result;

@@ -68,7 +68,6 @@ rwt.widgets.util.GridRowContainerWrapper._CONTAINER_DELEGATES = [
   "setBaseAppearance",
   "setCellToolTipsEnabled",
   "getRow",
-  "getRowCount",
   "setToolTipText"
 ];
 
@@ -78,8 +77,7 @@ rwt.widgets.util.GridRowContainerWrapper._CONTAINER_GETTER_DELEGATES = [
   "getHoverItem",
   "getElement",
   "getChildrenLength",
-  "findRowByElement",
-  "getRowIndex"
+  "getRowCount"
 ];
 
 rwt.widgets.util.GridRowContainerWrapper.prototype = {
@@ -139,6 +137,14 @@ rwt.widgets.util.GridRowContainerWrapper.prototype = {
     return result;
   },
 
+  findRowByElement : function( el ) {
+    var result = this._container[ 0 ].findRowByElement( el );
+    if( result == null ) {
+      result = this._container[ 0 ].findRowByElement( el );
+    }
+    return result;
+  },
+
   updateRowLines : function() {
     this._container[ 0 ].getRenderConfig().linesVisible = this._config.linesVisible;
     this._container[ 0 ].updateRowLines();
@@ -156,10 +162,10 @@ rwt.widgets.util.GridRowContainerWrapper.prototype = {
     return column < this._fixedColumns ? 0 : this._splitOffset;
   },
 
-  indexOf : function( child ) {
-    var index = this._container[ 0 ].indexOf( child );
+  getRowIndex : function( row ) {
+    var index = this._container[ 0 ].getRowIndex( row );
     if( index < 0 ) {
-      index = this._container[ 1 ].indexOf( child );
+      index = this._container[ 1 ].getRowIndex( row );
     }
     return index;
   },
