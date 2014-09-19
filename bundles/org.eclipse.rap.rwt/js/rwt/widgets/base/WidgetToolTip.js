@@ -99,9 +99,14 @@ rwt.qx.Class.define( "rwt.widgets.base.WidgetToolTip", {
     _targetDistance : 4,
 
     updateText : function() {
-      this._updateTextInternal();
-      if( this.getText() && !this._showTimer.isEnabled() ) {
-        this._onshowtimer();
+      if( this.getBoundToWidget() ) {
+        this._updateTextInternal();
+        if( this.getText() && !this._showTimer.isEnabled() ) {
+          this._onshowtimer();
+        }
+        if( !this.getText() ) {
+          this._quickHide();
+        }
       }
     },
 
