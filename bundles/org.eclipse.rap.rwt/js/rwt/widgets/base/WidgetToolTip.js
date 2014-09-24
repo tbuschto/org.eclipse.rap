@@ -28,7 +28,7 @@ rwt.qx.Class.define( "rwt.widgets.base.WidgetToolTip", {
     this.addEventListener( "mouseover", this._onMouseOver );
     this.addEventListener( "mouseout", this._onMouseOver );
     this.addEventListener( "mouseup", this._onMouseUp );
-    this._currentConfig = {};
+    this._config = {};
     this.setRestrictToPageOnOpen( false );
   },
 

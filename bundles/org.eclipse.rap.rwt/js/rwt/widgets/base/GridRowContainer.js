@@ -72,6 +72,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
         "selectionPadding" : null,
         "indentionWidth" : 16,
         "hasCheckBoxes" : false,
+        "autoHeight" : false,
         "checkBoxLeft" : null,
         "checkBoxWidth" : null,
         "columnCount" : 0,
@@ -100,6 +101,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     setTopItem : function( item, index, render ) {
       this._topItem = item;
       if( render ) {
+        var hoverRowIndex = -1;
+        if( this._hoverRow ) {
+          hoverRowIndex = this.getRowIndex( this._hoverRow );
+        }
         var delta = index - this._topItemIndex;
         this._topItemIndex = index;
         var forwards = delta > 0;
@@ -112,6 +117,10 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
           var newFirstRow = this.getRow( forwards ? delta : numberOfShiftingRows );
           this._sortRows( newFirstRow, forwards );
           this._updateRows( updateFromRow, delta, true );
+        }
+        if( hoverRowIndex !== -1 ) {
+          var newHoverRow = this.getRow( hoverRowIndex );
+          this._setHoverItem( this._items[ hoverRowIndex ], newHoverRow );
         }
       } else {
         this._topItemIndex = index;
@@ -404,20 +413,14 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
 
     _sortRows : function( newFirstRow, forwards ) {
       var lastRowIndex = this.getRowCount() - 1;
-      var hoverRowIndex = -1;
-      if( this._hoverRow ) {
-        hoverRowIndex = this.getRowIndex( this._hoverRow );
-      }
       while( this.getRow( 0 ) !== newFirstRow ) {
         if( forwards ) {
           this.$rows.append( this.getRow( 0 ).$el );
+          this._items.push( this._items.shift() );
         } else {
           this.$rows.prepend( this.getRow( lastRowIndex ).$el );
+          this._items.unshift( this._items.pop() );
         }
-      }
-      if( hoverRowIndex !== -1 ) {
-        var newHoverRow = this.getRow( hoverRowIndex );
-        this._setHoverItem( this.findItemByRow( newHoverRow ), this._hoverRow );
       }
     },
 

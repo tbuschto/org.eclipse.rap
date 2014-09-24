@@ -165,6 +165,49 @@ rwt.qx.Class.define( "org.eclipse.rwt.test.tests.GridRowContainerTest", {
       tree.destroy();
     },
 
+    testHoverRowAfterOptimizedScrollingForward : function() {
+      var tree = this._createDefaultTree();
+      tree.setScrollBarsVisible( false, true );
+      tree.setItemCount( 100 );
+      var container = tree.getRowContainer();
+      var items = [];
+      for( var i = 0; i < 100; i++ ) {
+        items[ i ] = new rwt.widgets.GridItem( tree.getRootItem(), i );
+        items[ i ].setTexts( [ "Test" + i ] );
+      }
+      TestUtil.flush();
+      TestUtil.hoverFromTo( document.body, container.getRow( 2 ) );
+      assertEquals( items[ 2 ], container.getHoverItem() );
+
+      tree._vertScrollBar.setValue( 1 );
+      TestUtil.flush();
+
+      assertEquals( items[ 3 ], container.getHoverItem() );
+      tree.destroy();
+    },
+
+    testHoverRowAfterOptimizedScrollingBackwards : function() {
+      var tree = this._createDefaultTree();
+      tree.setScrollBarsVisible( false, true );
+      tree.setItemCount( 100 );
+      var container = tree.getRowContainer();
+      var items = [];
+      for( var i = 0; i < 100; i++ ) {
+        items[ i ] = new rwt.widgets.GridItem( tree.getRootItem(), i );
+        items[ i ].setTexts( [ "Test" + i ] );
+      }
+      tree.setTopItemIndex( 1 );
+      TestUtil.flush();
+      TestUtil.hoverFromTo( document.body, container.getRow( 2 ) );
+      assertEquals( items[ 3 ], container.getHoverItem() );
+
+      tree._vertScrollBar.setValue( 0 );
+      TestUtil.flush();
+
+      assertEquals( items[ 2 ], container.getHoverItem() );
+      tree.destroy();
+    },
+
     testRenderEmptyRowOnHoverBug : function() {
       // See Bug 349310 - Mouseover on invisible items in SWT Tree
       var tree = this._createDefaultTree();
