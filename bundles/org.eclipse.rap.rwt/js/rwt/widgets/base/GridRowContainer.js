@@ -101,10 +101,6 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
     setTopItem : function( item, index, render ) {
       this._topItem = item;
       if( render ) {
-        var hoverRowIndex = -1;
-        if( this._hoverRow ) {
-          hoverRowIndex = this.getRowIndex( this._hoverRow );
-        }
         var delta = index - this._topItemIndex;
         this._topItemIndex = index;
         var forwards = delta > 0;
@@ -118,10 +114,7 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
           this._sortRows( newFirstRow, forwards );
           this._updateRows( updateFromRow, delta, true );
         }
-        if( hoverRowIndex !== -1 ) {
-          var newHoverRow = this.getRow( hoverRowIndex );
-          this._setHoverItem( this._items[ hoverRowIndex ], newHoverRow );
-        }
+        this._checkHoverItem();
       } else {
         this._topItemIndex = index;
       }
@@ -424,17 +417,19 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       }
     },
 
-    _onElementOver : function( event ) {
-      var target = event.getDomTarget();
-      var row = this.findRowByElement( target );
-      if( row ) {
-        var item = this.findItemByRow( row );
-        var targetTypes = row.identify( target );
-        if( item !== this._hoverItem || this._hoverTargetType[ 0 ] !== targetTypes[ 0 ] ) {
-          this._hoverTargetType = targetTypes;
-          this._setHoverItem( item, row );
-        }
+    _checkHoverItem : function() {
+      var x = rwt.event.MouseEvent.getClientX();
+      var y = rwt.event.MouseEvent.getClientY();
+      var element = document.elementFromPoint( x, y );
+      var row = this.findRowByElement( element );
+      if( this._hoverRow !== row ) {
+        this._onRowOver( this.findRowByElement( element ), element );
       }
+    },
+
+    _onElementOver : function( event ) {
+      var element = event.getDomTarget();
+      this._onRowOver( this.findRowByElement( element ), element );
     },
 
     _onElementOut : function( event ) {
@@ -443,6 +438,17 @@ rwt.qx.Class.define( "rwt.widgets.base.GridRowContainer", {
       if( !this.findRowByElement( related ) ) {
         this._hoverTargetType = [];
         this._setHoverItem( null, null );
+      }
+    },
+
+    _onRowOver : function( row, element ) {
+      if( row ) {
+        var item = this.findItemByRow( row );
+        var targetTypes = row.identify( element );
+        if( item !== this._hoverItem || this._hoverTargetType[ 0 ] !== targetTypes[ 0 ] ) {
+          this._hoverTargetType = targetTypes;
+          this._setHoverItem( item, row );
+        }
       }
     },
 
